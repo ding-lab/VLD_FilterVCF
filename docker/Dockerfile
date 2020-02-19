@@ -13,4 +13,4 @@ RUN pip install PyVCF argparse pysam==0.15.1
 RUN apt-get update && apt-get install -y \
     vim
 
-COPY . /opt/varscan_vcf_remap
+COPY . /opt/VLD_FilterVCF
