@@ -1,1 +1,1 @@
-IMAGE="mwyczalkowski/VLD_FilterVCF"
+IMAGE="mwyczalkowski/vld_filter_vcf"
