@@ -1,19 +1,17 @@
 from common_filter import *
 import sys
 
-# Filter VCF files according to tumor, normal read depth
+# Filter VCF files according to read depth
+# For multi-sample VCFs this criterion is applied to all samples
 #
 # the following parameters are required:
-# * min_depth_tumor
-# * min_depth_normal
-# * tumor_name
-# * normal_name
+# * min_depth
 # * caller caller - specifies tool used for variant call. 'strelka', 'varscan', 'pindel', 'mutect'
 #
 # These may be specified on the command line (e.g., --min_depth_normal 10) or in
 # configuration file, as specified by --config config.ini  Sample contents of config file:
 #   [read_depth]
-#   min_depth_normal = 10
+#   min_depth = 10
 #
 # optional command line parameters
 # --debug
@@ -31,10 +29,7 @@ class DepthFilter(ConfigFileFilter):
     @classmethod
     def customize_parser(self, parser):
 
-        parser.add_argument('--min_depth_tumor', type=int, help='Retain sites where read depth for tumor > given value')
-        parser.add_argument('--min_depth_normal', type=int, help='Retain sites where read depth for normal > given value')
-        parser.add_argument('--tumor_name', type=str, help='Tumor sample name in VCF')
-        parser.add_argument('--normal_name', type=str, help='Normal sample name in VCF')
+        parser.add_argument('--min_depth', type=int, help='Retain sites where read depth > min_depth')
         parser.add_argument('--caller', type=str, choices=['strelka', 'varscan', 'pindel', 'mutect'], help='Caller type')
         parser.add_argument('--debug', action="store_true", default=False, help='Print debugging information to stderr')
         parser.add_argument('--config', type=str, help='Optional configuration file')
@@ -52,16 +47,13 @@ class DepthFilter(ConfigFileFilter):
         config = self.read_config_file(args.config)
 
         self.set_args(config, args, "caller")
-        self.set_args(config, args, "min_depth_tumor", arg_type="int")
-        self.set_args(config, args, "min_depth_normal", arg_type="int")
-        self.set_args(config, args, "tumor_name")
-        self.set_args(config, args, "normal_name")
+        self.set_args(config, args, "min_depth", arg_type="int")
 
         # below becomes Description field in VCF
         if self.bypass:
             self.__doc__ = "Bypassing Depth filter, retaining all reads. Caller = %s" % (self.caller)
         else:
-            self.__doc__ = "Retain calls where read depth in tumor > %s and normal > %d. Caller = %s " % (self.min_depth_tumor, self.min_depth_normal, self.caller)
+            self.__doc__ = "Retain calls where read depth > %s . Caller = %s " % (self.min_depth, self.caller)
 
     def filter_name(self):
         return self.name
@@ -99,38 +91,38 @@ class DepthFilter(ConfigFileFilter):
 #            eprint("mutect depth_AD = %d, depth_DP = %d " % (depth, depth_DP) )
         return depth
 
-    def get_depth(self, VCF_record, sample_name):
-        data=VCF_record.genotype(sample_name).data
+    def get_depth(self, call_data):
         variant_caller = self.caller  
         if variant_caller == 'strelka':
-            return self.get_depth_strelka(data)
+            return self.get_depth_strelka(call_data)
         elif variant_caller == 'varscan':
-            return self.get_depth_varscan(data)
+            return self.get_depth_varscan(call_data)
         elif variant_caller == 'pindel':
-            return self.get_depth_pindel(data)
+            return self.get_depth_pindel(call_data)
         elif variant_caller == 'mutect':
-            return self.get_depth_mutect(data)
+            return self.get_depth_mutect(call_data)
         else:
             raise Exception( "Unknown caller: " + variant_caller)
 
     def __call__(self, record):
 
-        depth_N = self.get_depth(record, self.normal_name)
-        depth_T = self.get_depth(record, self.tumor_name)
-
-        if (self.debug):
-            eprint("Normal, Tumor depths: %d, %d" % (depth_N, depth_T))
-
         if self.bypass:
             if (self.debug): eprint("** Bypassing %s filter, retaining read **" % self.name )
             return
 
-        if depth_N < self.min_depth_normal:
-            if (self.debug): eprint("** FAIL NORMAL min_depth = %d ** " % depth_N)
-            return "depth_N: %d" % depth_N
-        if depth_T < self.min_depth_tumor:
-            if (self.debug): eprint("** FAIL TUMOR min_depth = %d ** " % depth_T)
-            return "depth_T: %d" % depth_T
+       # loop over all genotypes so that this code can work for both germline and somatic calls
+        for call in record.samples:
+            sample_name=call.sample
+            sample_data=call.data
+
+            depth = self.get_depth(sample_data)
+
+            if self.debug:
+                eprint("sample: %s  depth: %f" % (sample_name, depth))
+
+            if depth < self.min_depth:
+                if (self.debug): eprint("** FAIL min_depth = %d ** " % depth)
+            return "sample %s depth: %d" % (sample_name, depth)
 
         if (self.debug):
             eprint("** PASS read depth filter **")

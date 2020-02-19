@@ -2,11 +2,11 @@ from common_filter import *
 import sys
 
 # Filter VCF files according to minimum reference or alternate allele depth values
+# For multi-sample VCFs this criterion is applied to all samples
 #
 # the following parameters can be specified [default values]
 # * min_depth_alternate [0]
 # * min_depth_reference [0]
-# * sample_name [ SAMPLE ]
 # * caller [ VCF ]
 # * debug
 # * config 
@@ -23,7 +23,7 @@ import sys
 # * varscan: Varscan provides reference allele depth as RD and alternate allele depth as AD INFO fields
 #
 # Note that in GermlineCaller pipeline, we remap varscan VCF upstream of filtering using 
-# varscan_vcf_remap (https://github.com/ding-lab/varscan_vcf_remap); consequently, use such remapped
+# varscan_vcf_remap (https://github.com/ding-lab/varscan_vcf_remap); such remapped
 # VCFs should use "VCF" format
 
 # Based on depth_filter.py
@@ -38,7 +38,6 @@ class AlleleDepthFilter(ConfigFileFilter):
 
         parser.add_argument('--min_depth_reference', type=int, default=0, help='Retain sites where reference allele depth > given value')
         parser.add_argument('--min_depth_alternate', type=int, default=0, help='Retain sites where alternate allele depth > given value')
-        parser.add_argument('--sample_name', type=str, default="SAMPLE", help='Tumor sample name in VCF')
         parser.add_argument('--caller', type=str, choices=['VCF', 'varscan'], default="VCF", help='Caller type')
         parser.add_argument('--debug', action="store_true", default=False, help='Print debugging information to stderr')
         parser.add_argument('--config', type=str, help='Configuration file')
@@ -58,7 +57,6 @@ class AlleleDepthFilter(ConfigFileFilter):
         self.set_args(config, args, "caller")
         self.set_args(config, args, "min_depth_reference", arg_type="int")
         self.set_args(config, args, "min_depth_alternate", arg_type="int")
-        self.set_args(config, args, "sample_name")
 
         # below becomes Description field in VCF
         if self.bypass:
@@ -71,43 +69,47 @@ class AlleleDepthFilter(ConfigFileFilter):
         return self.name
 
     # Useful reference: https://github.com/ding-lab/varscan_vcf_remap
-    def get_depth_varscan(self, VCF_data):
+    def get_ad_varscan(self, VCF_data):
         ad_ref = VCF_data.AD
         ad_alt = VCF_data.RD
         if self.debug:
             eprint("Allele Depth ref, alt = %d, %d" % ad_ref, ad_alt)
         return ad_ref, ad_alt
 
-    def get_depth_VCF(self, VCF_data):
+    def get_ad_VCF(self, VCF_data):
         ad_ref, ad_alt = VCF_data.AD
         if self.debug:
             eprint("Allele Depth ref, alt = %d, %d" % ad_ref, ad_alt)
         return ad_ref, ad_alt
 
-    def get_allele_depth(self, VCF_record, sample_name):
-        data=VCF_record.genotype(sample_name).data
+    def get_allele_depth(self, call_data):
         variant_caller = self.caller  
         if variant_caller == 'VCF':
-            return self.get_ad_VCF(data)
+            return self.get_ad_VCF(call_data)
         elif variant_caller == 'varscan':
-            return self.get_ad_varscan(data)
+            return self.get_ad_varscan(call_data)
         else:
             raise Exception( "Unknown caller: " + variant_caller)
 
     def __call__(self, record):
-
-        ad_ref, ad_alt = self.get_allele_depth(record, self.sample_name)
-
         if self.bypass:
             if (self.debug): eprint("** Bypassing %s filter, retaining read **" % self.name )
             return
 
-        if ad_ref < self.min_depth_reference:
-            if (self.debug): eprint("** FAIL reference depth = %d ** " % ad_ref)
-            return "ad_ref: %d" % ad_ref
-        if ad_alt < self.min_depth_alternate:
-            if (self.debug): eprint("** FAIL alternate depth = %d ** " % ad_alt)
-            return "ad_alt: %d" % ad_alt
+        for call in record.samples:
+            sample_name=call.sample
+            sample_data=call.data
+
+            ad_ref, ad_alt = self.get_allele_depth(sample_data)
+            if self.debug:
+                eprint("sample: %s  AD ref: %f  AD alt: %f" % (sample_name, ad_ref, ad_alt))
+
+            if ad_ref < self.min_depth_reference:
+                if (self.debug): eprint("** FAIL reference depth = %d ** " % ad_ref)
+                return "Sample %s ad_ref: %d" % (sample_name, ad_ref)
+            if ad_alt < self.min_depth_alternate:
+                if (self.debug): eprint("** FAIL alternate depth = %d ** " % ad_alt)
+                return "Sample %s ad_alt: %d" % (sample_name, ad_alt)
 
         if (self.debug):
             eprint("** PASS read depth filter **")
