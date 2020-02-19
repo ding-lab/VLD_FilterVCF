@@ -13,4 +13,5 @@ RUN pip install PyVCF argparse pysam==0.15.1
 RUN apt-get update && apt-get install -y \
     vim
 
+ENV PYTHONPATH="/opt/VLD_FilterVCF/src:$PYTHONPATH"
 COPY . /opt/VLD_FilterVCF
