@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
 import vcf.filters
-import ConfigParser
+import configparser
 import os.path
 
 
