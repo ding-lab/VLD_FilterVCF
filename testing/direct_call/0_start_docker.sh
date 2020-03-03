@@ -8,6 +8,8 @@ else
     DATD=$1
 fi
 
-cd ../../docker && bash start_docker.sh $DATD
+source ../../docker/docker_image.sh
+
+cd ../.. && bash src/start_docker.sh $@ -I $IMAGE $DATD:data
 
 
