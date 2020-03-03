@@ -2,12 +2,9 @@
 # unless another path is passed on command line.  uses
 # the start_docker.sh script in /docker
 
-if [ -z $1 ]; then
-    DATD="../demo_data"
-else
-    DATD=$1
-fi
+DATAD="/home/mwyczalk_test/Projects/GermlineCaller/C3L-00001"
+source ../../docker/docker_image.sh
 
-cd ../../docker && bash start_docker.sh $DATD
+cd ../.. && bash src/start_docker.sh $@ -I $IMAGE $DATAD:/data
 
 
