@@ -1,6 +1,10 @@
 from common_filter import *
 import sys
 
+#
+# TODO: implement caller = GATK
+# 
+
 # Filter VCF files according to VAF values
 # Include only variants with min_vaf < VAF <= max_vaf and 
 # For multi-sample VCFs this criterion is applied to all samples
