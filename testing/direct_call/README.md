@@ -20,7 +20,7 @@ Testing the following filters:
   * `/opt/VLD_FilterVCF/src/allele_depth_filter.py`
   * has "VCF" or "varscan" as caller, and handling of remapped varscan is described
 
-Each of these will be tested on the following datasets:
+Each of these will be tested with script `src/run_vaf_length_depth_filters.sh` on the following datasets:
 * GATK
   * `/data/GATK.indel.Final.vcf`
   * `/data/GATK.snp.Final.vcf`
@@ -29,24 +29,3 @@ Each of these will be tested on the following datasets:
   * `/data/varscan_remapped/varscan.snp.vcf-remapped.vcf`
 * pindel
   * `/data/pindel_sifted.out.CvgVafStrand_pass.Homopolymer_pass.vcf`
-
-Also, test the combined script
-  * `/opt/VLD_FilterVCF/src/run_vaf_length_depth_filters.sh`
-
--> Be sure to test varscan carefully after remapping
-
-
-# Debugging
-
-bash 1a_vaf_GATK-indel.sh
-Traceback (most recent call last):
-  File "/opt/VLD_FilterVCF/src/vaf_filter.py", line 1, in <module>
-    from common_filter import *
-  File "/opt/VLD_FilterVCF/src/common_filter.py", line 4, in <module>
-    import ConfigParser
-ModuleNotFoundError: No module named 'ConfigParser'
-Written to /data/VLD_FilterVCF.out/GATK.indel.VLD.vcf
-root@783d66bfba49:/opt/VLD_FilterVCF/testing/direct_call# readlink -f ../../src/
-/opt/VLD_FilterVCF/src
-
-root@783d66bfba49:/opt/VLD_FilterVCF/testing/direct_call# export PYTHONPATH="/usr/local/lib/python3.7/site-packages:/opt/VLD_FilterVCF/src"
