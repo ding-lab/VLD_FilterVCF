@@ -9,7 +9,7 @@ import sys
 # the following parameters are required:
 # * min_vaf
 # * max_vaf
-# * caller - specifies tool used for variant call. 'strelka', 'varscan', 'pindel', 'merged', 'mutect'
+# * caller - specifies tool used for variant call. 'strelka', 'varscan', 'pindel', 'merged', 'mutect', 'GATK'
 #
 # These may be specified on the command line (e.g., --min_vaf 0.05) or in
 # configuration file, as specified by --config config.ini  Sample contents of config file:
