@@ -57,12 +57,18 @@ class IndelLengthFilter(ConfigFileFilter):
         return self.name
 
     def __call__(self, record):
+        # Pindel has SVLEN field in INFO, so use that if it exists, 
+        # otherwise calculate based on longest ALT field
 
-        # ALT will typically be a list
-        if isinstance(record.ALT, list):
-            len_ALT = len(max(record.ALT, key=len)) 
+        if "SVLEN" in record.INFO:
+            len_ALT=abs(record.INFO["SVLEN"])
         else:
-            len_ALT = len(record.ALT)
+            # ALT will typically be a list
+            if isinstance(record.ALT, list):
+                len_ALT = len(max(record.ALT, key=len)) 
+            else:
+                len_ALT = len(record.ALT)
+
         len_REF = len(record.REF)
         if (self.debug):
             eprint("Reference, Variant: %s, %s" % (record.REF, record.ALT))
