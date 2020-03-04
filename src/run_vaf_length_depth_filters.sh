@@ -42,7 +42,7 @@ OUT_VCF="-"
 TMPD="./output"
 
 # http://wiki.bash-hackers.org/howto/getopts_tutorial
-while getopts ":hdO:o:NeEfFgGjJ" opt; do
+while getopts ":hdO:o:NeEfFgGjJs:" opt; do
   case $opt in
     h)
       echo "$USAGE"
@@ -83,6 +83,9 @@ while getopts ":hdO:o:NeEfFgGjJ" opt; do
       ;;
     J)
       AD_ARG="$AD_ARG --bypass"
+      ;;
+    s)
+      SAMPLE_NAMES="$OPTARG"
       ;;
     \?)
       >&2 echo "Invalid option: -$OPTARG"
@@ -136,13 +139,13 @@ DEPTH_FILTER_ARGS="read_depth $DEPTH_ARG $CONFIG "
 
 # Arguments to AD filter
 AD_FILTER="vcf_filter.py --no-filtered --local-script allele_depth_filter.py"  # filter module
-AD_FILTER_ARGS="ad $AD_ARG $CONFIG " 
+AD_FILTER_ARGS="allele_depth $AD_ARG $CONFIG " 
 
 # Remap sample names in VCF by changing column names in header line
 # We replace commas with tabs in SAMPLE_NAME and write that as all columns past 9
 if [ "$SAMPLE_NAMES" ]; then
-    SNT=$( tr ',' '\t' < $SAMPLE_NAMES )
-    PRE_FILTER="awk -v snt=\$SNT 'BEGIN{FS="\t";OFS="\t"}{if (\$1 == \"#CHROM\") print \$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, snt; else print}' "
+    SNT=$( echo $SAMPLE_NAMES | tr ',' '\t'  )
+    PRE_FILTER="awk -v snt=\"$SNT\" 'BEGIN{FS=\"\\t\";OFS=\"\\t\"}{if (\$1 == \"#CHROM\") print \$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, snt; else print}' "
 else
     PRE_FILTER="cat "
 fi
@@ -159,15 +162,18 @@ else
     CMD1="$PRE_FILTER $VCF | $VAF_FILTER - $VAF_FILTER_ARGS > $OUT1"
     run_cmd "$CMD1" $DRYRUN
 
+# passing $OUT as argument doesn't work, but `cat OUT | filter - ` does work
     OUT2="$TMPD/length_filter_out.vcf"
-    CMD2="$LENGTH_FILTER $OUT1 $LENGTH_FILTER_ARGS > $OUT2"
+    #CMD2="$LENGTH_FILTER $OUT1 $LENGTH_FILTER_ARGS > $OUT2"
+    CMD2="cat $OUT1 | $LENGTH_FILTER - $LENGTH_FILTER_ARGS > $OUT2"
     run_cmd "$CMD2" $DRYRUN
 
     OUT3="$TMPD/depth_filter_out.vcf"
-    CMD3="$DEPTH_FILTER $OUT2 $DEPTH_FILTER_ARGS > $OUT3"
+    #CMD3="$DEPTH_FILTER $OUT2 $DEPTH_FILTER_ARGS > $OUT3"
+    CMD3="cat $OUT2 | $DEPTH_FILTER - $DEPTH_FILTER_ARGS > $OUT3"
     run_cmd "$CMD3" $DRYRUN
 
-    CMD4="$AD_FILTER $OUT3 $AD_FILTER_ARGS"
+    CMD4="cat $OUT3 | $AD_FILTER - $AD_FILTER_ARGS"
     if [ $OUT_VCF != "-" ]; then
         CMD4="$CMD4 > $OUT_VCF"
     fi

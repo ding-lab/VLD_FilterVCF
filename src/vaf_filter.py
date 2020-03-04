@@ -1,10 +1,6 @@
 from common_filter import *
 import sys
 
-#
-# TODO: implement caller = GATK
-# 
-
 # Filter VCF files according to VAF values
 # Include only variants with min_vaf < VAF <= max_vaf and 
 # For multi-sample VCFs this criterion is applied to all samples
@@ -29,6 +25,11 @@ import sys
 # For files with multiple samples, we loop over all of them and apply same criteria to all samples
 # for somatic calls, may need to implement per-sample vaf_min and vaf_max 
 
+# Details of how VAF is calculated per caller:
+# * GATK: VAF = AD[var] / DP
+# * varscan: VAF = FREQ
+# * ...
+
 # based on https://github.com/ding-lab/TinDaisy-Core/blob/master/src/vcf_filters/vaf_filter.py
 # However, the above is specific to somatic calls with tumor and normal samples in VCF, 
 # while this class is designed for germline
@@ -43,7 +44,7 @@ class TumorNormal_VAF(ConfigFileFilter):
 
         parser.add_argument('--min_vaf', type=float, help='Retain sites where VAF > min_vaf')
         parser.add_argument('--max_vaf', type=float, help='Retain sites where VAF <= max_vaf')
-        parser.add_argument('--caller', type=str, choices=['strelka', 'varscan', 'mutect', 'pindel', 'merged'], help='Caller type')
+        parser.add_argument('--caller', type=str, choices=['strelka', 'varscan', 'mutect', 'pindel', 'GATK', 'merged'], help='Caller type')
         parser.add_argument('--config', type=str, help='Optional configuration file')
         parser.add_argument('--debug', action="store_true", default=False, help='Print debugging information to stderr')
         parser.add_argument('--bypass', action="store_true", default=False, help='Bypass filter by retaining all variants')
@@ -159,7 +160,26 @@ class TumorNormal_VAF(ConfigFileFilter):
             eprint("pindel VCF = %f" % vaf)
         return vaf
 
-    def get_vaf(self, call_data, variant_caller=None):
+    def get_vaf_GATK(self, VCF_record, VCF_data):
+        # This works for both snp and indel calls
+        # VAF = AD / DP per https://gatkforums.broadinstitute.org/gatk/discussion/6202/vcf-file-and-allele-frequency
+        # from VCF 
+            ##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">
+            ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth (reads with MQ=255 or with bad mates are filtered)">
+        # if there are multiple alternate alleles we use the greatest value
+
+        AD_ref = VCF_data.AD[0]
+        AD_var = max(VCF_data.AD[1:])
+        DP = VCF_data.DP
+        if DP == 0:
+            vaf = 0.
+        else:
+            vaf = float(AD_var) / float(DP)
+        if self.debug:
+            eprint("GATK VAF = %d / %d = %f" % (AD_var, DP, vaf)) 
+        return vaf
+
+    def get_vaf(self, VCF_record, call_data, variant_caller=None):
         if variant_caller is None:
             variant_caller = self.caller  # we permit the possibility that each line has a different caller
 
@@ -171,6 +191,8 @@ class TumorNormal_VAF(ConfigFileFilter):
             return self.get_vaf_mutect(VCF_record, call_data)
         elif variant_caller == 'pindel':
             return self.get_vaf_pindel(VCF_record, call_data)
+        elif variant_caller == 'GATK':
+            return self.get_vaf_GATK(VCF_record, call_data)
         elif variant_caller == 'merged':
             # Caller is contained in 'set' INFO field
             merged_caller = VCF_record.INFO['set'][0]
@@ -210,7 +232,7 @@ class TumorNormal_VAF(ConfigFileFilter):
             sample_name=call.sample
             sample_data=call.data
 
-            sample_vaf = self.get_vaf(sample_data)
+            vaf = self.get_vaf(call, sample_data)
 
             if self.debug:
                 eprint("sample: %s  vaf: %f" % (sample_name, vaf))

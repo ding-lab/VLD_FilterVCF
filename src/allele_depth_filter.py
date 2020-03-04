@@ -36,8 +36,8 @@ class AlleleDepthFilter(ConfigFileFilter):
     @classmethod
     def customize_parser(self, parser):
 
-        parser.add_argument('--min_depth_reference', type=int, default=0, help='Retain sites where reference allele depth > given value')
-        parser.add_argument('--min_depth_alternate', type=int, default=0, help='Retain sites where alternate allele depth > given value')
+        parser.add_argument('--min_depth_reference', type=int, help='Retain sites where reference allele depth > given value')
+        parser.add_argument('--min_depth_alternate', type=int, help='Retain sites where alternate allele depth > given value')
         parser.add_argument('--caller', type=str, choices=['VCF', 'varscan'], default="VCF", help='Caller type')
         parser.add_argument('--debug', action="store_true", default=False, help='Print debugging information to stderr')
         parser.add_argument('--config', type=str, help='Configuration file')
@@ -70,17 +70,19 @@ class AlleleDepthFilter(ConfigFileFilter):
 
     # Useful reference: https://github.com/ding-lab/varscan_vcf_remap
     def get_ad_varscan(self, VCF_data):
-        ad_ref = VCF_data.AD
-        ad_alt = VCF_data.RD
+        AD_ref = VCF_data.AD
+        AD_alt = VCF_data.RD
         if self.debug:
-            eprint("Allele Depth ref, alt = %d, %d" % ad_ref, ad_alt)
-        return ad_ref, ad_alt
+            eprint("Allele Depth ref, alt = %d, %d" % AD_ref, AD_alt)
+        return AD_ref, AD_alt
 
     def get_ad_VCF(self, VCF_data):
-        ad_ref, ad_alt = VCF_data.AD
+        # if there are multiple alternate alleles we use the greatest value
+        AD_ref = VCF_data.AD[0]
+        AD_alt = max(VCF_data.AD[1:])
         if self.debug:
-            eprint("Allele Depth ref, alt = %d, %d" % ad_ref, ad_alt)
-        return ad_ref, ad_alt
+            eprint("Allele Depth ref, alt = %d, %d" % (AD_ref, AD_alt))
+        return AD_ref, AD_alt
 
     def get_allele_depth(self, call_data):
         variant_caller = self.caller  
@@ -100,16 +102,16 @@ class AlleleDepthFilter(ConfigFileFilter):
             sample_name=call.sample
             sample_data=call.data
 
-            ad_ref, ad_alt = self.get_allele_depth(sample_data)
+            AD_ref, AD_alt = self.get_allele_depth(sample_data)
             if self.debug:
-                eprint("sample: %s  AD ref: %f  AD alt: %f" % (sample_name, ad_ref, ad_alt))
+                eprint("sample: %s  AD ref: %f  AD alt: %f" % (sample_name, AD_ref, AD_alt))
 
-            if ad_ref < self.min_depth_reference:
-                if (self.debug): eprint("** FAIL reference depth = %d ** " % ad_ref)
-                return "Sample %s ad_ref: %d" % (sample_name, ad_ref)
-            if ad_alt < self.min_depth_alternate:
-                if (self.debug): eprint("** FAIL alternate depth = %d ** " % ad_alt)
-                return "Sample %s ad_alt: %d" % (sample_name, ad_alt)
+            if AD_ref < self.min_depth_reference:
+                if (self.debug): eprint("** FAIL reference depth = %d ** " % AD_ref)
+                return "Sample %s AD_ref: %d" % (sample_name, AD_ref)
+            if AD_alt < self.min_depth_alternate:
+                if (self.debug): eprint("** FAIL alternate depth = %d ** " % AD_alt)
+                return "Sample %s AD_alt: %d" % (sample_name, AD_alt)
 
         if (self.debug):
             eprint("** PASS read depth filter **")
