@@ -19,7 +19,7 @@ Options:
 -g: Depth filter debug mode
 -G: Depth filter bypass
 -j: Allele depth filter debug mode
--J: Allele depthAD filter bypass
+-J: Allele depth filter bypass
 -s SAMPLE_NAMES: rename sample names in VCF header with values from comma-separated list
 
 VCF is input VCF file
