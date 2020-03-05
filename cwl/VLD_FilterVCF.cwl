@@ -75,6 +75,18 @@ inputs:
       prefix: '-G'
     label: Bypass allele depth
     doc: Allele depth filter bypass mode
+  - id: VCF
+    type: File
+    inputBinding:
+      position: 1
+    label: VCF
+    doc: VCF input file to filter
+  - id: config
+    type: File
+    inputBinding:
+      position: 2
+    label: config
+    doc: configuration file used by all filters
 outputs:
   - id: output
     type: File
