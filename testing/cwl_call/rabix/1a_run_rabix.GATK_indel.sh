@@ -1,6 +1,6 @@
 cd ../../..
-CWL="cwl/pindel_caller.Pindel_GermlineCaller.cwl"
-YAML="testing/cwl_call/demo.yaml"
+CWL="cwl/VLD_FilterVCF.cwl"
+YAML="testing/cwl_call/yaml/VLD_FilterVCF.GATK_indel.yaml"
 
 mkdir -p results
 RABIX_ARGS="--basedir results"
