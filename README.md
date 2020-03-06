@@ -11,6 +11,14 @@ See https://github.com/ding-lab/varscan_vcf_remap.git
 
 Code based on https://github.com/ding-lab/TinDaisy-Core  TinDaisy-Core/src/vcf_filters
 
+## Installation
+
+Uses `start_docker.sh` from [WUDocker](https://github.com/ding-lab/WUDocker.git)
+Obtain with,
+```
+git clone https://github.com/ding-lab/WUDocker.git
+```
+
 ## Contact
 
 Matt Wyczalkowski (m.wyczalkowski@wustl.edu)
