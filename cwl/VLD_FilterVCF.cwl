@@ -1,6 +1,8 @@
 class: CommandLineTool
 cwlVersion: v1.0
-id: vld_filter_vcf
+$namespaces:
+  sbg: 'https://www.sevenbridges.com/'
+id: _v_l_d__filter_v_c_f
 baseCommand:
   - /bin/bash
   - /opt/VLD_FilterVCF/src/run_vaf_length_depth_filters.sh
@@ -25,56 +27,7 @@ inputs:
       position: 0
       prefix: '-e'
     label: Debug VAF
-    doc: VAF filter debug mode
-  - id: bypass_VAF
-    type: boolean?
-    inputBinding:
-      position: 0
-      prefix: '-E'
-    label: Bypass VAF
-    doc: VAF filter bypass mode
-  - id: debug_length
-    type: boolean?
-    inputBinding:
-      position: 0
-      prefix: '-f'
-    label: Debug length
-    doc: Length filter debug mode
-  - id: bypass_length
-    type: boolean?
-    inputBinding:
-      position: 0
-      prefix: '-F'
-    label: Bypass length
-    doc: Length filter bypass mode
-  - id: debug_depth
-    type: boolean?
-    inputBinding:
-      position: 0
-      prefix: '-g'
-    label: Debug depth
-    doc: Depth filter debug mode
-  - id: bypass_depth
-    type: boolean?
-    inputBinding:
-      position: 0
-      prefix: '-G'
-    label: Bypass depth
-    doc: Depth filter bypass mode
-  - id: debug_allele_depth
-    type: boolean?
-    inputBinding:
-      position: 0
-      prefix: '-j'
-    label: Debug allele depth
-    doc: Allele depth filter debug mode
-  - id: bypass_allele_depth
-    type: boolean?
-    inputBinding:
-      position: 0
-      prefix: '-G'
-    label: Bypass allele depth
-    doc: Allele depth filter bypass mode
+    doc: VAF Filter debug mode
   - id: VCF
     type: File
     inputBinding:
