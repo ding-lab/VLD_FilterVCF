@@ -21,6 +21,7 @@ Options:
 -j: Allele depth filter debug mode
 -J: Allele depth filter bypass
 -s SAMPLE_NAMES: rename sample names in VCF header with values from comma-separated list
+-R: remove filtered variants.  Default is to retain filtered variants with filter name in VCF FILTER field
 
 VCF is input VCF file
 CONFIG_FN is configuration file used by all filters
@@ -42,7 +43,7 @@ OUT_VCF="-"
 TMPD="./output"
 
 # http://wiki.bash-hackers.org/howto/getopts_tutorial
-while getopts ":hdO:o:NeEfFgGjJs:" opt; do
+while getopts ":hdO:o:NeEfFgGjJs:R" opt; do
   case $opt in
     h)
       echo "$USAGE"
@@ -87,6 +88,9 @@ while getopts ":hdO:o:NeEfFgGjJs:" opt; do
     s)
       SAMPLE_NAMES="$OPTARG"
       ;;
+    R)
+      FILTER_ARG="--no-filtered"
+      ;;
     \?)
       >&2 echo "Invalid option: -$OPTARG"
       >&2 echo "$USAGE"
@@ -119,26 +123,23 @@ if [ "$NO_PIPE" ]; then
     run_cmd "mkdir -p $TMPD" $DRYRUN
 fi    
 
-
-MAIN_FILTER="vcf_filter.py --no-filtered" # Assuming in path
-
 # Common configuration file is used for all filters
 CONFIG="--config $CONFIG_FN"
 
 # Arguments to VAF filter.  
-VAF_FILTER="vcf_filter.py --no-filtered --local-script vaf_filter.py"  # filter module
+VAF_FILTER="vcf_filter.py $FILTER_ARG --local-script vaf_filter.py"  # filter module
 VAF_FILTER_ARGS="vaf $VAF_ARG $CONFIG "
 
 # Arguments to length filter
-LENGTH_FILTER="vcf_filter.py --no-filtered --local-script length_filter.py"  # filter module
+LENGTH_FILTER="vcf_filter.py $FILTER_ARG --local-script length_filter.py"  # filter module
 LENGTH_FILTER_ARGS="length $LENGTH_ARG $CONFIG" 
 
 # Arguments to depth filter
-DEPTH_FILTER="vcf_filter.py --no-filtered --local-script depth_filter.py"  # filter module
+DEPTH_FILTER="vcf_filter.py $FILTER_ARG --local-script depth_filter.py"  # filter module
 DEPTH_FILTER_ARGS="read_depth $DEPTH_ARG $CONFIG " 
 
 # Arguments to AD filter
-AD_FILTER="vcf_filter.py --no-filtered --local-script allele_depth_filter.py"  # filter module
+AD_FILTER="vcf_filter.py $FILTER_ARG --local-script allele_depth_filter.py"  # filter module
 AD_FILTER_ARGS="allele_depth $AD_ARG $CONFIG " 
 
 # Remap sample names in VCF by changing column names in header line

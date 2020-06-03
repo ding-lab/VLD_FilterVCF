@@ -40,6 +40,14 @@ inputs:
       position: 2
     label: config
     doc: configuration file used by all filters
+  - id: remove_filtered
+    type: boolean?
+    inputBinding:
+      position: 0
+      prefix: '-R'
+    doc: >-
+      Remove filtered variants.  Default is to retain filtered variants with
+      filter name in VCF FILTER field
 outputs:
   - id: output
     type: File
