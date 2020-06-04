@@ -1,1 +1,0 @@
-/home/mwyczalk_test/Projects/WUDocker/start_docker.sh
