@@ -114,6 +114,11 @@ fi
 VCF=$1 ; confirm $VCF
 CONFIG_FN=$2 ; confirm $CONFIG_FN
 
+VCF_EXT=${VCF##*.}
+if [ $VCF_EXT == "gz" ]; then
+    VCF_GZ=1
+fi
+
 # Create output paths if necessary
 if [ $OUT_VCF != "-" ]; then
     OUTD=$(dirname $OUT_VCF)
@@ -146,31 +151,36 @@ AD_FILTER_ARGS="allele_depth $AD_ARG $CONFIG "
 # We replace commas with tabs in SAMPLE_NAME and write that as all columns past 9
 if [ "$SAMPLE_NAMES" ]; then
     SNT=$( echo $SAMPLE_NAMES | tr ',' '\t'  )
-    PRE_FILTER="awk -v snt=\"$SNT\" 'BEGIN{FS=\"\\t\";OFS=\"\\t\"}{if (\$1 == \"#CHROM\") print \$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, snt; else print}' "
+    REMAP="awk -v snt=\"$SNT\" 'BEGIN{FS=\"\\t\";OFS=\"\\t\"}{if (\$1 == \"#CHROM\") print \$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, snt; else print}' "
 else
-    PRE_FILTER="cat "
+    REMAP="cat "
+fi
+
+# zcat is necessary if remapping sample names, not needed for filters.
+if [ "$VCF_GZ" == 1 ]; then
+    CAT="zcat"
+else
+    CAT="cat"
 fi
 
 
 if [ -z $NO_PIPE ]; then
-    CMD="$PRE_FILTER $VCF | $VAF_FILTER - $VAF_FILTER_ARGS | $LENGTH_FILTER - $LENGTH_FILTER_ARGS | $DEPTH_FILTER - $DEPTH_FILTER_ARGS | $AD_FILTER - $AD_FILTER_ARGS"
+    CMD="$CAT $VCF | $REMAP | $VAF_FILTER - $VAF_FILTER_ARGS | $LENGTH_FILTER - $LENGTH_FILTER_ARGS | $DEPTH_FILTER - $DEPTH_FILTER_ARGS | $AD_FILTER - $AD_FILTER_ARGS"
     if [ $OUT_VCF != "-" ]; then
         CMD="$CMD > $OUT_VCF"
     fi
     run_cmd "$CMD" $DRYRUN
 else
     OUT1="$TMPD/vaf_filter_out.vcf"
-    CMD1="$PRE_FILTER $VCF | $VAF_FILTER - $VAF_FILTER_ARGS > $OUT1"
+    CMD1="$CAT $VCF | $REMAP | $VAF_FILTER - $VAF_FILTER_ARGS > $OUT1"
     run_cmd "$CMD1" $DRYRUN
 
 # passing $OUT as argument doesn't work, but `cat OUT | filter - ` does work
     OUT2="$TMPD/length_filter_out.vcf"
-    #CMD2="$LENGTH_FILTER $OUT1 $LENGTH_FILTER_ARGS > $OUT2"
     CMD2="cat $OUT1 | $LENGTH_FILTER - $LENGTH_FILTER_ARGS > $OUT2"
     run_cmd "$CMD2" $DRYRUN
 
     OUT3="$TMPD/depth_filter_out.vcf"
-    #CMD3="$DEPTH_FILTER $OUT2 $DEPTH_FILTER_ARGS > $OUT3"
     CMD3="cat $OUT2 | $DEPTH_FILTER - $DEPTH_FILTER_ARGS > $OUT3"
     run_cmd "$CMD3" $DRYRUN
 
