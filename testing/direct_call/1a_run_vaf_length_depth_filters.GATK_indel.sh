@@ -3,7 +3,6 @@ OUTD="/data/VLD_FilterVCF.out"
 mkdir -p $OUTD
 
 VCF="/data/GATK.indel.Final.vcf.gz"
-#VCF="/data/GATK.indel.Final-short.vcf"
 CONFIG="../../params/VLD_FilterVCF-GATK.config.ini"
 
 OUT="$OUTD/GATK.indel.VLD.SAMPLE.vcf"
