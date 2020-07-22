@@ -2,7 +2,7 @@ class: CommandLineTool
 cwlVersion: v1.0
 $namespaces:
   sbg: 'https://www.sevenbridges.com/'
-id: _v_l_d__filter_v_c_f
+id: vld_filter_vcf
 baseCommand:
   - /bin/bash
   - /opt/VLD_FilterVCF/src/run_vaf_length_depth_filters.sh
