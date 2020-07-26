@@ -27,8 +27,8 @@ Relative to above,
 ### Config file B
 
 [vaf]
-min_vaf_somatic = 0.05
-max_vaf_germline = 0.02
+min_vaf_somatic = 0.05      -> renamed to min_vaf_tumor
+max_vaf_germline = 0.02     -> renamed to max_vaf_normal
 tumor_name = TUMOR
 normal_name = NORMAL
 caller = varscan
