@@ -1,10 +1,11 @@
 #/bin/bash
 
 read -r -d '' USAGE_DEPTH <<'EOF'
-Run depth filter on a VCF 
+Filter VCF files according to read depth
+For multi-sample VCFs this criterion is applied to all samples
 
 Usage:
-  bash run_depth_filter.sh [options] VCF CONFIG_FN
+  bash run_depth_filter.sh [options] VCF 
 
 Options:
 -h: Print this help message
@@ -12,10 +13,12 @@ Options:
 -o OUT_VCF: Output VCF.  Default writes to STDOUT
 -e: filter debug mode
 -E: filter bypass
+-C CONFIG_FN: optional filter configuration file with `depth` section
 -R: remove filtered variants.  Default is to retain filtered variants with filter name in VCF FILTER field
+-m min_depth: Retain sites where read depth > min_depth
 
 VCF is input VCF file
-CONFIG_FN is configuration file with `depth` section
+See python/depth_filter.py for additional details
 ...
 EOF
 
@@ -23,7 +26,7 @@ FILTER_SCRIPT="depth_filter.py"  # filter module
 FILTER_NAME="depth"
 USAGE="$USAGE_DEPTH"
 
-### aim is to have all filter-specific details above
+### have all filter-specific details above, except for some filter-specific argument parsing below
 
 # No provision is made for executing multiple consequtive filters using UNIX pipes
 # (e.g., cmd1 | cmd2).  See https://github.com/ding-lab/VLD_FilterVCF for example of pipes
@@ -41,7 +44,7 @@ export PYTHONPATH="/opt/VLD_FilterVCF/src/python:$PYTHONPATH"
 OUT_VCF="-"
 
 # http://wiki.bash-hackers.org/howto/getopts_tutorial
-while getopts ":hdo:eER" opt; do
+while getopts ":hdo:eERm:" opt; do
   case $opt in
     h)
       echo "$USAGE"
@@ -62,6 +65,9 @@ while getopts ":hdo:eER" opt; do
     R)
       CMD_ARGS="--no-filtered"
       ;;
+    m)
+      FILTER_ARGS="$FILTER_ARGS --min_depth $OPTARG"
+      ;;
     \?)
       >&2 echo "Invalid option: -$OPTARG"
       >&2 echo "$USAGE"
@@ -76,14 +82,13 @@ while getopts ":hdo:eER" opt; do
 done
 shift $((OPTIND-1))
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 1 ]; then
     >&2 echo Error: Wrong number of arguments
     >&2 echo "$USAGE"
     exit 1
 fi
 
 VCF=$1 ; confirm $VCF
-CONFIG_FN=$2 ; confirm $CONFIG_FN
 
 # Create output paths if necessary
 if [ $OUT_VCF != "-" ]; then
@@ -91,12 +96,9 @@ if [ $OUT_VCF != "-" ]; then
     run_cmd "mkdir -p $OUTD" $DRYRUN
 fi
 
-# Common configuration file is used for all filters
-CONFIG="--config $CONFIG_FN"
-
 # `cat VCF | vcf_filter.py` avoids weird errors
 FILTER_CMD="cat $VCF |  /usr/local/bin/vcf_filter.py $CMD_ARGS --local-script $FILTER_SCRIPT - $FILTER_NAME" # filter module
-CMD="$FILTER_CMD  $FILTER_ARGS $CONFIG --input_vcf $VCF"
+CMD="$FILTER_CMD  $FILTER_ARGS --input_vcf $VCF"
     
 if [ $OUT_VCF != "-" ]; then
     CMD="$CMD > $OUT_VCF"

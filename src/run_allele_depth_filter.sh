@@ -1,10 +1,11 @@
 #/bin/bash
 
 read -r -d '' USAGE_ALLELE_DEPTH <<'EOF'
-Run length filter on a VCF 
+Filter VCF files according to minimum reference or alternate allele depth values
+For multi-sample VCFs this criterion is applied to all samples
 
 Usage:
-  bash run_allele_depth_filter.sh [options] VCF CONFIG_FN
+  bash run_depth_filter.sh [options] VCF 
 
 Options:
 -h: Print this help message
@@ -12,10 +13,20 @@ Options:
 -o OUT_VCF: Output VCF.  Default writes to STDOUT
 -e: filter debug mode
 -E: filter bypass
+-C CONFIG_FN: optional filter configuration file with `allele_depth` section
 -R: remove filtered variants.  Default is to retain filtered variants with filter name in VCF FILTER field
+-m min_depth_reference: Retain sites where reference allele depth > given value
+-M min_depth_alternate: Retain sites where alternate allele depth > given value
+-c caller: Anticipated format of AD field.  Values "VCF" or "varscan"
 
 VCF is input VCF file
-CONFIG_FN is configuration file with `af` section
+
+Caller field provides information about fields available in VCF.  Values:
+* VCF: Standard format (e.g., GATK) has AD INFO field format as A,B with A and B the reference andthe alternate allele depth, respectively
+* varscan: Varscan provides reference allele depth as RD and alternate allele depth as AD INFO fields
+Note that a VCF which has been processed with varscan_vcf_remap will be processed with caller="VCF"
+
+See python/allele_depth_filter.py for additional details
 ...
 EOF
 
@@ -23,7 +34,7 @@ FILTER_SCRIPT="allele_depth_filter.py"  # filter module
 FILTER_NAME="allele_depth"
 USAGE="$USAGE_ALLELE_DEPTH"
 
-### aim is to have all filter-specific details above
+### have all filter-specific details above, except for some filter-specific argument parsing below
 
 # No provision is made for executing multiple consequtive filters using UNIX pipes
 # (e.g., cmd1 | cmd2).  See https://github.com/ding-lab/VLD_FilterVCF for example of pipes
@@ -41,7 +52,7 @@ export PYTHONPATH="/opt/VLD_FilterVCF/src/python:$PYTHONPATH"
 OUT_VCF="-"
 
 # http://wiki.bash-hackers.org/howto/getopts_tutorial
-while getopts ":hdo:eER" opt; do
+while getopts ":hdo:eERm:M:c:" opt; do
   case $opt in
     h)
       echo "$USAGE"
@@ -62,6 +73,15 @@ while getopts ":hdo:eER" opt; do
     R)
       CMD_ARGS="--no-filtered"
       ;;
+    m)
+      FILTER_ARGS="$FILTER_ARGS --min_depth_reference $OPTARG"
+      ;;
+    M)
+      FILTER_ARGS="$FILTER_ARGS --min_depth_alternate $OPTARG"
+      ;;
+    C)
+      FILTER_ARGS="$FILTER_ARGS --caller $OPTARG"
+      ;;
     \?)
       >&2 echo "Invalid option: -$OPTARG"
       >&2 echo "$USAGE"
@@ -76,14 +96,13 @@ while getopts ":hdo:eER" opt; do
 done
 shift $((OPTIND-1))
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 1 ]; then
     >&2 echo Error: Wrong number of arguments
     >&2 echo "$USAGE"
     exit 1
 fi
 
 VCF=$1 ; confirm $VCF
-CONFIG_FN=$2 ; confirm $CONFIG_FN
 
 # Create output paths if necessary
 if [ $OUT_VCF != "-" ]; then
@@ -91,12 +110,9 @@ if [ $OUT_VCF != "-" ]; then
     run_cmd "mkdir -p $OUTD" $DRYRUN
 fi
 
-# Common configuration file is used for all filters
-CONFIG="--config $CONFIG_FN"
-
 # `cat VCF | vcf_filter.py` avoids weird errors
 FILTER_CMD="cat $VCF |  /usr/local/bin/vcf_filter.py $CMD_ARGS --local-script $FILTER_SCRIPT - $FILTER_NAME" # filter module
-CMD="$FILTER_CMD  $FILTER_ARGS $CONFIG --input_vcf $VCF"
+CMD="$FILTER_CMD  $FILTER_ARGS --input_vcf $VCF"
     
 if [ $OUT_VCF != "-" ]; then
     CMD="$CMD > $OUT_VCF"

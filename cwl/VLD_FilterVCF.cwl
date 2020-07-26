@@ -53,6 +53,9 @@ outputs:
     type: File
     outputBinding:
       glob: VLD_FilterVCF_output.vcf
+doc: >-
+  Run VAF, length, read depth, and allele depth filters on a VCF and optionaly
+  rename sample names
 label: VLD_FilterVCF
 arguments:
   - position: 0

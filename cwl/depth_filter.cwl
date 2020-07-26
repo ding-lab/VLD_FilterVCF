@@ -2,10 +2,10 @@ class: CommandLineTool
 cwlVersion: v1.0
 $namespaces:
   sbg: 'https://www.sevenbridges.com/'
-id: vaf_filter
+id: depth_filter
 baseCommand:
   - /bin/bash
-  - /opt/VLD_FilterVCF/src/run_vaf_filter.sh
+  - /opt/VLD_FilterVCF/src/run_depth_filter.sh
 inputs:
   - id: debug
     type: boolean?
@@ -26,7 +26,7 @@ inputs:
       position: 0
       prefix: '-C'
     label: config
-    doc: optional filter configuration file with `vaf` section
+    doc: optional filter configuration file with `depth` section
   - id: remove_filtered
     type: boolean?
     inputBinding:
@@ -41,40 +41,25 @@ inputs:
       position: 0
       prefix: '-E'
     label: Bypass filter
-  - id: min_vaf
+  - id: min_depth
     type: float?
     inputBinding:
       position: 0
       prefix: '-m'
-    doc: Retain sites where VAF > min_vaf
-  - id: max_vaf
-    type: float?
-    inputBinding:
-      position: 0
-      prefix: '-x'
-    doc: Retain sites where VAF <= max_vaf
-  - id: caller
-    type: string?
-    inputBinding:
-      position: 0
-      prefix: '-c'
-    doc: >-
-      specifies tool used for variant call. 'strelka', 'varscan', 'pindel',
-      'merged', 'mutect', 'GATK'
+    doc: Retain sites where read depth > min_depth
 outputs:
   - id: output
     type: File
     outputBinding:
-      glob: vaf_filter.output.vcf
+      glob: depth_filter.output.vcf
 doc: |-
-  Filter VCF files according to VAF values.
-  Include only variants with min_vaf < VAF <= max_vaf.
-  For multi-sample VCFs this criterion is applied to all samples.
-label: VAF Filter
+    Filter VCF files according to read depth
+    For multi-sample VCFs this criterion is applied to all samples
+label: Depth Filter
 arguments:
   - position: 0
     prefix: '-o'
-    valueFrom: vaf_filter.output.vcf
+    valueFrom: depth_filter.output.vcf
 requirements:
   - class: ResourceRequirement
     ramMin: 2000

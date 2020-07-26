@@ -2,10 +2,10 @@ class: CommandLineTool
 cwlVersion: v1.0
 $namespaces:
   sbg: 'https://www.sevenbridges.com/'
-id: vaf_filter
+id: allele_depth_filter
 baseCommand:
   - /bin/bash
-  - /opt/VLD_FilterVCF/src/run_vaf_filter.sh
+  - /opt/VLD_FilterVCF/src/run_allele_depth_filter.sh
 inputs:
   - id: debug
     type: boolean?
@@ -26,7 +26,7 @@ inputs:
       position: 0
       prefix: '-C'
     label: config
-    doc: optional filter configuration file with `vaf` section
+    doc: optional filter configuration file with `allele_depth` section
   - id: remove_filtered
     type: boolean?
     inputBinding:
@@ -41,40 +41,38 @@ inputs:
       position: 0
       prefix: '-E'
     label: Bypass filter
-  - id: min_vaf
+  - id: min_depth_reference
     type: float?
     inputBinding:
       position: 0
       prefix: '-m'
-    doc: Retain sites where VAF > min_vaf
-  - id: max_vaf
+    doc: Retain sites where reference allele depth > given value
+  - id: min_depth_alternate
     type: float?
     inputBinding:
       position: 0
-      prefix: '-x'
-    doc: Retain sites where VAF <= max_vaf
+      prefix: '-M'
+    doc: Retain sites where alternate allele depth > given value
   - id: caller
     type: string?
     inputBinding:
       position: 0
       prefix: '-c'
     doc: >-
-      specifies tool used for variant call. 'strelka', 'varscan', 'pindel',
-      'merged', 'mutect', 'GATK'
+      AD field format, "VCF" or "varscan" (for non-remapped varscan output)
 outputs:
   - id: output
     type: File
     outputBinding:
-      glob: vaf_filter.output.vcf
+      glob: allele_depth_filter.output.vcf
 doc: |-
-  Filter VCF files according to VAF values.
-  Include only variants with min_vaf < VAF <= max_vaf.
-  For multi-sample VCFs this criterion is applied to all samples.
-label: VAF Filter
+    Filter VCF files according to minimum reference or alternate allele depth values.
+    For multi-sample VCFs this criterion is applied to all samples.
+label: Allele Depth Filter
 arguments:
   - position: 0
     prefix: '-o'
-    valueFrom: vaf_filter.output.vcf
+    valueFrom: allele_depth_filter.output.vcf
 requirements:
   - class: ResourceRequirement
     ramMin: 2000

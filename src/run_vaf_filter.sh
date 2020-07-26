@@ -1,12 +1,12 @@
 #/bin/bash
 
 read -r -d '' USAGE_VAF <<'EOF'
-Filter VCF files according to VAF values
-Include only variants with min_vaf < VAF <= max_vaf and 
-For multi-sample VCFs this criterion is applied to all samples
+Filter VCF files according to VAF values.
+Include only variants with min_vaf < VAF <= max_vaf.
+For multi-sample VCFs this criterion is applied to all samples.
 
 Usage:
-  bash run_vaf_filter.sh [options] VCF CONFIG_FN
+  bash run_vaf_filter.sh [options] VCF 
 
 Options:
 -h: Print this help message
@@ -14,14 +14,13 @@ Options:
 -o OUT_VCF: Output VCF.  Default writes to STDOUT
 -e: filter debug mode
 -E: filter bypass
--C config: optional configuration file
+-C CONFIG_FN: optional filter configuration file with `vaf` section
 -R: remove filtered variants.  Default is to retain filtered variants with filter name in VCF FILTER field
 -m min_vaf: Retain sites where VAF > min_vaf
 -x max_vaf: Retain sites where VAF <= max_vaf
 -c caller: specifies tool used for variant call. 'strelka', 'varscan', 'pindel', 'merged', 'mutect', 'GATK'
 
 VCF is input VCF file
-CONFIG_FN is configuration file with `vaf` section
 See python/vaf_filter.py for additional details
 ...
 EOF
@@ -109,12 +108,9 @@ if [ $OUT_VCF != "-" ]; then
     run_cmd "mkdir -p $OUTD" $DRYRUN
 fi
 
-# Common configuration file is used for all filters
-CONFIG="--config $CONFIG_FN"
-
 # `cat VCF | vcf_filter.py` avoids weird errors
 FILTER_CMD="cat $VCF |  /usr/local/bin/vcf_filter.py $CMD_ARGS --local-script $FILTER_SCRIPT - $FILTER_NAME" # filter module
-CMD="$FILTER_CMD  $FILTER_ARGS $CONFIG --input_vcf $VCF"
+CMD="$FILTER_CMD  $FILTER_ARGS --input_vcf $VCF"
     
 if [ $OUT_VCF != "-" ]; then
     CMD="$CMD > $OUT_VCF"

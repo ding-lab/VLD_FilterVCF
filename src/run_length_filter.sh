@@ -1,10 +1,12 @@
 #/bin/bash
 
 read -r -d '' USAGE_LENGTH <<'EOF'
-Run length filter on a VCF 
+Filter VCF files according to indel length.
+Retain calls where length of variant and reference > min_length and < max_length
+
 
 Usage:
-  bash run_length_filter.sh [options] VCF CONFIG_FN
+  bash run_length_filter.sh [options] VCF 
 
 Options:
 -h: Print this help message
@@ -12,10 +14,13 @@ Options:
 -o OUT_VCF: Output VCF.  Default writes to STDOUT
 -e: filter debug mode
 -E: filter bypass
+-C CONFIG_FN: optional filter configuration file with `length` section
 -R: remove filtered variants.  Default is to retain filtered variants with filter name in VCF FILTER field
+-m min_length: Retain sites where indel length > given value
+-x max_length: Retain sites where indel length <= given value. 0 disables test
 
 VCF is input VCF file
-CONFIG_FN is configuration file with `af` section
+See python/length_filter.py for additional details
 ...
 EOF
 
@@ -23,13 +28,13 @@ FILTER_SCRIPT="length_filter.py"  # filter module
 FILTER_NAME="length"
 USAGE="$USAGE_LENGTH"
 
-### aim is to have all filter-specific details above
+### have all filter-specific details above, except for some filter-specific argument parsing below
 
 # No provision is made for executing multiple consequtive filters using UNIX pipes
-# (e.g., cmd1 | cmd2).  See https://github.com/ding-lab/VLD_FilterVCF for example of pipes
+# (e.g., cmd1 | cmd2).  See https://github.com/ding-lab/VLD_FilterVCF run_vaf_length_depth_filters.sh for example of pipes
 
 # call format
-# cat VCF | vcf_filter.py CMD_ARGS --local-script FILTER_SCRIPT - $FILTER_NAME $FILTER_ARGS $CONFIG
+# cat VCF | vcf_filter.py CMD_ARGS --local-script FILTER_SCRIPT - $FILTER_NAME $FILTER_ARGS
 # filter description: https://pyvcf.readthedocs.io/en/latest/FILTERS.html#adding-a-filter
 
 source /opt/VLD_FilterVCF/src/utils.sh
@@ -41,7 +46,7 @@ export PYTHONPATH="/opt/VLD_FilterVCF/src/python:$PYTHONPATH"
 OUT_VCF="-"
 
 # http://wiki.bash-hackers.org/howto/getopts_tutorial
-while getopts ":hdo:eER" opt; do
+while getopts ":hdo:eERC:m:x:" opt; do
   case $opt in
     h)
       echo "$USAGE"
@@ -62,6 +67,15 @@ while getopts ":hdo:eER" opt; do
     R)
       CMD_ARGS="--no-filtered"
       ;;
+    C)
+      FILTER_ARGS="$FILTER_ARGS --config $OPTARG"
+      ;;
+    m)
+      FILTER_ARGS="$FILTER_ARGS --min_vaf $OPTARG"
+      ;;
+    x)
+      FILTER_ARGS="$FILTER_ARGS --max_vaf $OPTARG"
+      ;;
     \?)
       >&2 echo "Invalid option: -$OPTARG"
       >&2 echo "$USAGE"
@@ -76,14 +90,13 @@ while getopts ":hdo:eER" opt; do
 done
 shift $((OPTIND-1))
 
-if [ "$#" -ne 2 ]; then
+if [ "$#" -ne 1 ]; then
     >&2 echo Error: Wrong number of arguments
     >&2 echo "$USAGE"
     exit 1
 fi
 
 VCF=$1 ; confirm $VCF
-CONFIG_FN=$2 ; confirm $CONFIG_FN
 
 # Create output paths if necessary
 if [ $OUT_VCF != "-" ]; then
@@ -91,12 +104,9 @@ if [ $OUT_VCF != "-" ]; then
     run_cmd "mkdir -p $OUTD" $DRYRUN
 fi
 
-# Common configuration file is used for all filters
-CONFIG="--config $CONFIG_FN"
-
 # `cat VCF | vcf_filter.py` avoids weird errors
 FILTER_CMD="cat $VCF |  /usr/local/bin/vcf_filter.py $CMD_ARGS --local-script $FILTER_SCRIPT - $FILTER_NAME" # filter module
-CMD="$FILTER_CMD  $FILTER_ARGS $CONFIG --input_vcf $VCF"
+CMD="$FILTER_CMD  $FILTER_ARGS --input_vcf $VCF"
     
 if [ $OUT_VCF != "-" ]; then
     CMD="$CMD > $OUT_VCF"
