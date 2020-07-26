@@ -36,7 +36,7 @@ import sys
 class TumorNormal_VAF(ConfigFileFilter):
     'Filter variant sites by variant allele frequency (VAF)'
 
-    name = 'vaf'
+    name = 'germline_vaf'
 
     @classmethod
     def customize_parser(self, parser):

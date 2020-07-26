@@ -2,10 +2,10 @@ class: CommandLineTool
 cwlVersion: v1.0
 $namespaces:
   sbg: 'https://www.sevenbridges.com/'
-id: vaf_filter
+id: somatic_vaf_filter
 baseCommand:
   - /bin/bash
-  - /opt/VLD_FilterVCF/src/run_vaf_filter.sh
+  - /opt/VLD_FilterVCF/src/run_somatic_vaf_filter.sh
 inputs:
   - id: debug
     type: boolean?
@@ -26,7 +26,7 @@ inputs:
       position: 0
       prefix: '-C'
     label: config
-    doc: optional filter configuration file with `vaf` section
+    doc: optional filter configuration file with `somatic_vaf` section
   - id: remove_filtered
     type: boolean?
     inputBinding:
@@ -41,40 +41,43 @@ inputs:
       position: 0
       prefix: '-E'
     label: Bypass filter
-  - id: min_vaf
+  - id: min_vaf_tumor
     type: float?
     inputBinding:
       position: 0
       prefix: '-m'
-    doc: Retain sites where VAF > min_vaf
-  - id: max_vaf
+    doc: Retain sites where tumor VAF > min_vaf_tumor
+  - id: max_vaf_normal
     type: float?
     inputBinding:
       position: 0
       prefix: '-x'
-    doc: Retain sites where VAF <= max_vaf
+    doc: Retain sites where normal VAF <= max_vaf_normal
   - id: caller
     type: string?
     inputBinding:
       position: 0
       prefix: '-c'
     doc: >-
-      specifies tool used for variant call. 'strelka', 'varscan', 'pindel',
-      'merged', 'mutect', 'GATK'
+      specifies tool used for variant call. 'strelka', 'varscan', 'mutect', 'pindel', 'merged'
 outputs:
   - id: output
     type: File
     outputBinding:
-      glob: vaf_filter.output.vcf
+      glob: somatic_vaf_filter.output.vcf
 doc: |-
-  Filter VCF files according to VAF values.
-  Include only variants with min_vaf < VAF <= max_vaf.
-  For multi-sample VCFs this criterion is applied to all samples.
-label: VAF Filter
+  Filter VCF files according to tumor, normal VAF values
+label: Somatic VAF Filter
 arguments:
   - position: 0
+    prefix: '-T'
+    valueFrom: TUMOR
+  - position: 0
+    prefix: '-N'
+    valueFrom: NORMAL
+  - position: 0
     prefix: '-o'
-    valueFrom: vaf_filter.output.vcf
+    valueFrom: somatic_vaf_filter.output.vcf
 requirements:
   - class: ResourceRequirement
     ramMin: 2000

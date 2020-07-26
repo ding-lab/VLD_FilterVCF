@@ -5,27 +5,26 @@ import sys
 #
 # This is called from pyvcf's `vcf_filter.py` with `vaf` module.
 # the following parameters are required:
-# * min_vaf_somatic
-# * max_vaf_germline
+# * min_vaf_tumor  (previously called min_vaf_somatic)
+# * max_vaf_normal (previously called max_vaf_germline)
 # * tumor_name
 # * normal_name
 # * caller - specifies tool used for variant call. 'strelka', 'varscan', 'pindel', 'merged', 'mutect'
 #
-# These may be specified on the command line (e.g., --min_vaf_somatic 0.05) or in
+# These may be specified on the command line (e.g., --min_vaf_tumor 0.05) or in
 # configuration file, as specified by --config config.ini  Sample contents of config file:
 #   [vaf]
-#   min_vaf_somatic = 0.05
+#   min_vaf_tumor = 0.05
 #
 # optional command line parameters
 # --debug
 # --config config.ini
 # --bypass
-# --pass_only
 
 class TumorNormal_VAF(ConfigFileFilter):
     'Filter variant sites by tumor and normal VAF (variant allele frequency)'
 
-    name = 'vaf'
+    name = 'somatic_vaf'
 
     # for merged caller, will evaluate call based on value of 'set' variable
 
@@ -33,15 +32,14 @@ class TumorNormal_VAF(ConfigFileFilter):
     def customize_parser(self, parser):
         # super(TumorNormal_VAF, cls).customize_parser(parser)
 
-        parser.add_argument('--min_vaf_somatic', type=float, help='Retain sites where tumor VAF > than given value')
-        parser.add_argument('--max_vaf_germline', type=float, help='Retain sites where normal VAF <= than given value')
+        parser.add_argument('--min_vaf_tumor', type=float, help='Retain sites where tumor VAF > than given value')
+        parser.add_argument('--max_vaf_normal', type=float, help='Retain sites where normal VAF <= than given value')
         parser.add_argument('--tumor_name', type=str, help='Tumor sample name in VCF')
         parser.add_argument('--normal_name', type=str, help='Normal sample name in VCF')
         parser.add_argument('--caller', type=str, choices=['strelka', 'varscan', 'mutect', 'pindel', 'merged'], help='Caller type')
         parser.add_argument('--config', type=str, help='Optional configuration file')
         parser.add_argument('--debug', action="store_true", default=False, help='Print debugging information to stderr')
         parser.add_argument('--bypass', action="store_true", default=False, help='Bypass filter by retaining all variants')
-        parser.add_argument('--pass_only', action="store_true", default=False, help='Retain only variants with passing FILTER values')
         
     def __init__(self, args):
         # These will not be set from config file (though could be)
@@ -55,23 +53,16 @@ class TumorNormal_VAF(ConfigFileFilter):
         config = self.read_config_file(args.config)
 
         self.set_args(config, args, "caller")
-        self.set_args(config, args, "min_vaf_somatic", arg_type="float")
-        self.set_args(config, args, "max_vaf_germline", arg_type="float")
+        self.set_args(config, args, "min_vaf_tumor", arg_type="float")
+        self.set_args(config, args, "max_vaf_normal", arg_type="float")
         self.set_args(config, args, "tumor_name")
         self.set_args(config, args, "normal_name")
-        self.set_args(config, args, "pass_only")
 
         # below becomes Description field in VCF
         if self.bypass:
-            if self.pass_only:
-                self.__doc__ = "Bypassing Tumor Normal VAF filter, retaining all variants where FILTER=PASS.  Caller = %s" % (self.caller)
-            else:
-                self.__doc__ = "Bypassing Tumor Normal VAF filter, retaining all variants.  Caller = %s" % (self.caller)
+            self.__doc__ = "Bypassing Tumor Normal VAF filter, retaining all variants.  Caller = %s" % (self.caller)
         else:
-            if self.pass_only:
-                self.__doc__ = "Retain variants where normal VAF <= %f, tumor VAF >= %f, and FILTER=PASS.  Caller = %s " % (self.max_vaf_germline, self.min_vaf_somatic, self.caller)
-            else:
-                self.__doc__ = "Retain variants where normal VAF <= %f and tumor VAF >= %f.  Caller = %s " % (self.max_vaf_germline, self.min_vaf_somatic, self.caller)
+            self.__doc__ = "Retain variants where normal VAF <= %f and tumor VAF >= %f.  Caller = %s " % (self.max_vaf_normal, self.min_vaf_tumor, self.caller)
             
     def filter_name(self):
         return self.name
@@ -188,15 +179,6 @@ class TumorNormal_VAF(ConfigFileFilter):
             raise Exception( "Unknown caller: " + variant_caller)
 
     def __call__(self, record):
-    # filter to exclude any calls except PASS
-    # This is from /home/mwyczalk_test/Projects/TinDaisy/mutect-tool/src/mutect-tool.py
-        # specific code borrowed from https://pyvcf.readthedocs.io/en/latest/_modules/vcf/model.html#_Record
-        if record.FILTER is not None and len(record.FILTER) != 0:
-            msg = "record.FILTER = %s" % str(record.FILTER)
-            if self.debug: 
-                eprint(msg)
-            if self.pass_only:
-                return msg
 
         vaf_N = self.get_vaf(record, self.normal_name)
         vaf_T = self.get_vaf(record, self.tumor_name)
@@ -209,15 +191,15 @@ class TumorNormal_VAF(ConfigFileFilter):
             return
 
 ##       Original logic, with 2=Tumor
-##           RETAIN if($rc2var/$r_tot2>=$min_vaf_somatic && $rcvar/$r_tot<=$max_vaf_germline && $r_tot2>=$min_coverage && $r_tot>=$min_coverage)
+##           RETAIN if($rc2var/$r_tot2>=$min_vaf_tumor && $rcvar/$r_tot<=$max_vaf_normal && $r_tot2>=$min_coverage && $r_tot>=$min_coverage)
 ##       Here, logic is reversed.  We return if fail a test
-        if vaf_T < self.min_vaf_somatic:
+        if vaf_T < self.min_vaf_tumor:
             if (self.debug):
-                eprint("** FAIL vaf_T < min_vaf_somatic **")
+                eprint("** FAIL vaf_T < min_vaf_tumor **")
             return "VAF_T: %f" % vaf_T
-        if vaf_N >= self.max_vaf_germline:
+        if vaf_N >= self.max_vaf_normal:
             if (self.debug):
-                eprint("** FAIL vaf_N >= max_vaf_germline **")
+                eprint("** FAIL vaf_N >= max_vaf_normal **")
             return "VAF_N: %f" % vaf_N
         if (self.debug):
             eprint("** PASS VAF filter **")

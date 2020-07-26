@@ -1,12 +1,11 @@
 #/bin/bash
 
 read -r -d '' USAGE_VAF <<'EOF'
-Filter VCF files according to VAF values.
-Include only variants with min_vaf < VAF <= max_vaf.
-For multi-sample VCFs this criterion is applied to all samples.
+Filter VCF files according to tumor, normal VAF values
+
 
 Usage:
-  bash run_vaf_filter.sh [options] VCF 
+  bash run_somatic_vaf_filter.sh [options] VCF 
 
 Options:
 -h: Print this help message
@@ -14,19 +13,21 @@ Options:
 -o OUT_VCF: Output VCF.  Default writes to STDOUT
 -e: filter debug mode
 -E: filter bypass
--C CONFIG_FN: optional filter configuration file with `vaf` section
+-C CONFIG_FN: optional filter configuration file with `somatic_vaf` section
 -R: remove filtered variants.  Default is to retain filtered variants with filter name in VCF FILTER field
--m min_vaf: Retain sites where VAF > min_vaf
--x max_vaf: Retain sites where VAF <= max_vaf
--c caller: specifies tool used for variant call. 'strelka', 'varscan', 'pindel', 'merged', 'mutect', 'GATK'
+-m min_vaf_tumor: Retain sites where tumor VAF > than given value (aka min_vaf_somatic)
+-x max_vaf_normal: Retain sites where normal VAF <= than given value (aka max_vaf_germline)
+-c caller: specifies tool used for variant call. 'strelka', 'varscan', 'mutect', 'pindel', 'merged'
+-T tumor_name: Tumor sample name in VCF
+-N normal_name: Normal sample name in VCF
 
 VCF is input VCF file
-See python/vaf_filter.py for additional details
+See python/germline_vaf_filter.py for additional details
 ...
 EOF
 
-FILTER_SCRIPT="vaf_filter.py"  # filter module
-FILTER_NAME="vaf"
+FILTER_SCRIPT="somatic_vaf_filter.py"  # filter module
+FILTER_NAME="somatic_vaf"
 USAGE="$USAGE_VAF"
 
 ### have all filter-specific details above, except for some filter-specific argument parsing below
@@ -47,7 +48,7 @@ export PYTHONPATH="/opt/VLD_FilterVCF/src/python:$PYTHONPATH"
 OUT_VCF="-"
 
 # http://wiki.bash-hackers.org/howto/getopts_tutorial
-while getopts ":hdo:eERC:m:x:c:" opt; do
+while getopts ":hdo:eERC:m:x:c:T:N:" opt; do
   case $opt in
     h)
       echo "$USAGE"
@@ -72,13 +73,19 @@ while getopts ":hdo:eERC:m:x:c:" opt; do
       FILTER_ARGS="$FILTER_ARGS --config $OPTARG"
       ;;
     m)
-      FILTER_ARGS="$FILTER_ARGS --min_vaf $OPTARG"
+      FILTER_ARGS="$FILTER_ARGS --min_vaf_tumor $OPTARG"
       ;;
     x)
-      FILTER_ARGS="$FILTER_ARGS --max_vaf $OPTARG"
+      FILTER_ARGS="$FILTER_ARGS --max_vaf_normal $OPTARG"
       ;;
     c)
       FILTER_ARGS="$FILTER_ARGS --caller $OPTARG"
+      ;;
+    T)
+      FILTER_ARGS="$FILTER_ARGS --tumor_name $OPTARG"
+      ;;
+    N)
+      FILTER_ARGS="$FILTER_ARGS --normal_name $OPTARG"
       ;;
     \?)
       >&2 echo "Invalid option: -$OPTARG"

@@ -1,7 +1,7 @@
 #/bin/bash
 
 read -r -d '' USAGE <<'EOF'
-Run VAF, length, read depth, and allele depth filters on a VCF and optionaly rename sample names
+Run germline VAF, length, read depth, and allele depth filters on a VCF and optionaly rename sample names
 
 Usage:
   bash run_vaf_length_depth_filters.sh [options] VCF CONFIG_FN
@@ -132,7 +132,7 @@ fi
 CONFIG="--config $CONFIG_FN"
 
 # Arguments to VAF filter.  
-VAF_FILTER="vcf_filter.py $FILTER_ARG --local-script vaf_filter.py"  # filter module
+VAF_FILTER="vcf_filter.py $FILTER_ARG --local-script vaf_germline_filter.py"  # filter module
 VAF_FILTER_ARGS="vaf $VAF_ARG $CONFIG "
 
 # Arguments to length filter
