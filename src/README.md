@@ -19,6 +19,14 @@ the indvidual steps simpler at the expense of performance.
 This approach is being adopted for TinDaisy (20200725, and we provide CWL steps for individual VAF, Length, Depth filters.
 Calling ./run_vaf_length_depth_filters.sh and skipping the AF filter will reproduce these results
 
+### VAF Filter
+VAF filter code (src/vcf_filters/vaf_filter.py) from TinDaisy is specific to somatic calls, with tumor and normal
+samples assumed.  It is being renamed vaf_filter_somatic.py
+
+VAF filter code (python/vaf_filter.py) from VLD_FilterVCF is based on the above
+and is currently specific to germline, though could be more readily generalied.  It is being
+renamed vaf_filter_germline.py
+
 
 ## pyvcf code
 FYI: pyvcf code can be found on image here: /usr/local/lib/python3.8/site-packages/vcf
