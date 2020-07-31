@@ -85,7 +85,7 @@ class IndelLengthFilter(ConfigFileFilter):
             if (self.debug): eprint("** FAIL ALT min_length = %d **" % len_ALT)
             return "len_ALT: %f" % len_ALT
 
-        if self.max_length is not 0:
+        if self.max_length != 0:
             if len_REF > self.max_length:
                 if (self.debug): eprint("** FAIL REF max_length = %d **" % len_REF)
                 return "len_REF: %f" % len_REF

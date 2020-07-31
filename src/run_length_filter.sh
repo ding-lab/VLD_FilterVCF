@@ -71,10 +71,10 @@ while getopts ":hdo:eERC:m:x:" opt; do
       FILTER_ARGS="$FILTER_ARGS --config $OPTARG"
       ;;
     m)
-      FILTER_ARGS="$FILTER_ARGS --min_vaf $OPTARG"
+      FILTER_ARGS="$FILTER_ARGS --min_length $OPTARG"
       ;;
     x)
-      FILTER_ARGS="$FILTER_ARGS --max_vaf $OPTARG"
+      FILTER_ARGS="$FILTER_ARGS --max_length $OPTARG"
       ;;
     \?)
       >&2 echo "Invalid option: -$OPTARG"
@@ -106,7 +106,7 @@ fi
 
 # `cat VCF | vcf_filter.py` avoids weird errors
 FILTER_CMD="cat $VCF |  /usr/local/bin/vcf_filter.py $CMD_ARGS --local-script $FILTER_SCRIPT - $FILTER_NAME" # filter module
-CMD="$FILTER_CMD  $FILTER_ARGS --input_vcf $VCF"
+CMD="$FILTER_CMD  $FILTER_ARGS "
     
 if [ $OUT_VCF != "-" ]; then
     CMD="$CMD > $OUT_VCF"
