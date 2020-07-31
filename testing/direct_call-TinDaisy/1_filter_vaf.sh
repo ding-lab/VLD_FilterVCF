@@ -1,7 +1,7 @@
 OUTD="/results"
 mkdir -p $OUTD
 
-INPUT="$DATAD/inputs/-246599121/varscan-remapped.vcf"
+INPUT="/data/inputs/-246599121/varscan-remapped.vcf"
 
 OUT="$OUTD/somatic_vaf-filtered.vcf"
 
@@ -11,9 +11,9 @@ OUT="$OUTD/somatic_vaf-filtered.vcf"
 # -T tumor_name: Tumor sample name in VCF
 # -N normal_name: Normal sample name in VCF
 
-ARGS="-m 0.05 -x 0.02 -c varscan -T TUMMOR -N NORMAL"
+ARGS="-m 0.05 -x 0.02 -c varscan -T TUMOR -N NORMAL"
 
-CMD="bash ../../src/run_somatic_vaf_filter.sh $@ -o $OUT $EXCLUDE $INPUT"
+CMD="bash ../../src/run_somatic_vaf_filter.sh $@ $ARGS -o $OUT $EXCLUDE $INPUT"
 
 >&2 echo Running $CMD
 eval $CMD
