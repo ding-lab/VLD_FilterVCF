@@ -18,7 +18,6 @@ import sys
 # --config config.ini
 # --bypass
 #
-# Note, parser just needs the leading unique string, so --bypass will generally work
 
 class DepthFilter(ConfigFileFilter):
     'Filter variant sites by read depth'
