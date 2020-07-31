@@ -9,6 +9,6 @@ mkdir -p $OUTD
 source docker/docker_image.sh
 IMAGE=$IMAGE
 
-bash docker/WUDocker/start_docker.sh $@ -I $IMAGE $DATAD:/data $REFD:/Reference $OUTD:/results
+bash docker/WUDocker/start_docker.sh $@ -I $IMAGE $DATAD:/data $OUTD:/results
 
 
