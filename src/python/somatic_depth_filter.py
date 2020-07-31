@@ -12,7 +12,7 @@ import sys
 #
 # These may be specified on the command line (e.g., --min_depth_normal 10) or in
 # configuration file, as specified by --config config.ini  Sample contents of config file:
-#   [read_depth]
+#   [somatic_depth]
 #   min_depth_normal = 10
 #
 # optional command line parameters
@@ -26,7 +26,7 @@ class DepthFilter(ConfigFileFilter):
     'Filter variant sites by read depth'
     # Normally we would be able to use the built-in filter "dps"; however, pindel does not write the DP tag and depth filtering fails
 
-    name = 'read_depth'
+    name = 'somatic_depth'
 
     @classmethod
     def customize_parser(self, parser):
