@@ -5,9 +5,8 @@ source /opt/lsf9/conf/lsf.conf
 
 CONFIG="cromwell-config-db.dat"
 
-#CWL="/gscuser/mwyczalk/projects/TinDaisy/TinDaisy/cwl/mutect-tool/cwl/mutect.cwl"
-CWL="../../../cwl/hotspotfilter.cwl"
-YAML="cwl-yaml/HotspotFilter_demo.yaml"
+CWL="../../../cwl/somatic_vaf_filter.cwl"
+YAML="cwl-yaml/somatic_vaf_filter.yaml"
 
 
 CROMWELL="/usr/local/cromwell/cromwell-47.jar"

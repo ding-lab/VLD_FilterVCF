@@ -1,0 +1,17 @@
+# -m min_vaf_tumor: Retain sites where tumor VAF > than given value (aka min_vaf_somatic)
+# # -x max_vaf_normal: Retain sites where normal VAF <= than given value (aka max_vaf_germline)
+# # -c caller: specifies tool used for variant call. 'strelka', 'varscan', 'mutect', 'pindel', 'merged'
+# # -T tumor_name: Tumor sample name in VCF
+# # -N normal_name: Normal sample name in VCF
+#
+# ARGS="-m 0.05 -x 0.02 -c varscan -T TUMOR -N NORMAL"
+
+caller: varscan  
+max_vaf_normal: 0.02  
+min_vaf_tumor: 0.05
+bypass: false  
+remove_filtered: false  
+VCF:  
+    class: File
+    path: /home/mwyczalk_test/Projects/TinDaisy/testing/C3L-00908-data/dat/call-hotspot_vld_varscan_snv/hotspot_vld.cwl/27ac9be3-7575-4477-8f85-5d3652992ee9/call-vaf_length_depth_filters_B/inputs/-246599121/varscan-remapped.vcf
+debug: false  
