@@ -5,7 +5,7 @@ $namespaces:
 id: depth_filter
 baseCommand:
   - /bin/bash
-  - /opt/VLD_FilterVCF/src/run_depth_filter.sh
+  - /opt/VLD_FilterVCF/src/run_germline_depth_filter.sh
 inputs:
   - id: debug
     type: boolean?
@@ -51,7 +51,7 @@ outputs:
   - id: output
     type: File
     outputBinding:
-      glob: depth_filter.output.vcf
+      glob: germline_depth_filter.output.vcf
 doc: |-
   Filter VCF files according to read depth
   For multi-sample VCFs this criterion is applied to all samples
@@ -59,7 +59,7 @@ label: Depth Filter
 arguments:
   - position: 0
     prefix: '-o'
-    valueFrom: depth_filter.output.vcf
+    valueFrom: germline_depth_filter.output.vcf
 requirements:
   - class: ResourceRequirement
     ramMin: 2000

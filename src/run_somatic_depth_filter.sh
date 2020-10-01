@@ -5,7 +5,7 @@ Filter VCF files according to read depth
 For multi-sample VCFs this criterion is applied to all samples
 
 Usage:
-  bash run_depth_filter.sh [options] VCF 
+  bash run_somatic_depth_filter.sh [options] VCF 
 
 Options:
 -h: Print this help message
