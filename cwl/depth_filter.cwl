@@ -42,7 +42,7 @@ inputs:
       prefix: '-E'
     label: Bypass filter
   - id: min_depth
-    type: float?
+    type: int?
     inputBinding:
       position: 0
       prefix: '-m'
@@ -53,8 +53,8 @@ outputs:
     outputBinding:
       glob: depth_filter.output.vcf
 doc: |-
-    Filter VCF files according to read depth
-    For multi-sample VCFs this criterion is applied to all samples
+  Filter VCF files according to read depth
+  For multi-sample VCFs this criterion is applied to all samples
 label: Depth Filter
 arguments:
   - position: 0

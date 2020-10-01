@@ -42,13 +42,13 @@ inputs:
       prefix: '-E'
     label: Bypass filter
   - id: min_length
-    type: float?
+    type: int?
     inputBinding:
       position: 0
       prefix: '-m'
     doc: Retain sites where indel length > given value
   - id: max_length
-    type: float?
+    type: int?
     inputBinding:
       position: 0
       prefix: '-x'
@@ -58,9 +58,11 @@ outputs:
     type: File
     outputBinding:
       glob: length_filter.output.vcf
-doc: |-
-    Filter VCF files according to indel length.
-    Retain calls where length of variant and reference > min_length and < max_length 
+doc: >-
+  Filter VCF files according to indel length.
+
+  Retain calls where length of variant and reference > min_length and <
+  max_length 
 label: Length Filter
 arguments:
   - position: 0
