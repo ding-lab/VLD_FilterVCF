@@ -1,0 +1,8 @@
+max_length: 100
+min_length: 0  # type "int" (optional)
+bypass: false  # type "boolean" (optional)
+remove_filtered: false  # type "boolean" (optional)
+VCF:  # type "File"
+    class: File
+    path: /gscmnt/gc2541/cptac3_analysis/cromwell-workdir/cromwell-executions/tindaisy-hotspot.cwl/47c63123-dab6-417b-a431-c9aa9589e6e4/results/call-hotspot_vld_varscan_snv/hotspot_vld.cwl/27ac9be3-7575-4477-8f85-5d3652992ee9/call-vaf_length_depth_filters_B/inputs/-246599121/varscan-remapped.vcf
+debug: false  # type "boolean" (optional)
