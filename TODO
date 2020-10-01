@@ -1,0 +1,4 @@
+To do to finish TinDaisy testing:
+* direct testing of all filters has succeeded
+* test docker and cwl
+ -- VAF and depth filters are specific to "somatic", need to be invoked as such
