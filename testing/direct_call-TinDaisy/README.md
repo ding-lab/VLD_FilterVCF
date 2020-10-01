@@ -3,6 +3,7 @@ Testing of individual filters for TinDaisy on katmai.
 Using test CCRCC case C3L-00908.
 See MGI:/gscuser/mwyczalk/projects/TinDaisy/testing/dbSnP-filter-dev/VEP_annotate.testing.C3L-00908/testing/README.data.md
 for details on this dataset.  It is based on CromwellRunner run: 06_CCRCC.HotSpot.20200511
+Path on MGI: /gscmnt/gc2541/cptac3_analysis/cromwell-workdir/cromwell-executions/tindaisy-hotspot.cwl/47c63123-dab6-417b-a431-c9aa9589e6e4/results
 
 Results of this run are copied to katmai here:
 /home/mwyczalk_test/Projects/TinDaisy/testing/C3L-00908-data/dat

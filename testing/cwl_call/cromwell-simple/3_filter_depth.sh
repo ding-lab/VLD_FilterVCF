@@ -5,8 +5,8 @@ source /opt/lsf9/conf/lsf.conf
 
 CONFIG="cromwell-config-db.dat"
 
-CWL="../../../cwl/length_filter.cwl"
-YAML="cwl-yaml/length_filter.yaml"
+CWL="../../../cwl/somatic_depth_filter.cwl"
+YAML="cwl-yaml/somatic_depth_filter.yaml"
 
 
 CROMWELL="/usr/local/cromwell/cromwell-47.jar"
