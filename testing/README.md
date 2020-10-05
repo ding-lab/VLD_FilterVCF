@@ -8,3 +8,5 @@ direct_call-TinDaisy   - somatic caller workflow
  - this is well developed
 direct_call-TinJasmine - germline caller workflow
  - this should be updated based on direct_call-TinDaisy model, with TinJasmine test data
+
+See direct_call/README.md for details about test parameter settings
