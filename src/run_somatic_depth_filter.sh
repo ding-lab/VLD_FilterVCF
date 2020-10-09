@@ -106,6 +106,13 @@ fi
 
 VCF=$1 ; confirm $VCF
 
+VCF_EXT=${VCF##*.}
+if [ $VCF_EXT == "gz" ]; then
+    CAT="zcat"
+else
+    CAT="cat"
+fi
+
 # Create output paths if necessary
 if [ $OUT_VCF != "-" ]; then
     OUTD=$(dirname $OUT_VCF)
@@ -113,8 +120,8 @@ if [ $OUT_VCF != "-" ]; then
 fi
 
 # `cat VCF | vcf_filter.py` avoids weird errors
-FILTER_CMD="cat $VCF |  /usr/local/bin/vcf_filter.py $CMD_ARGS --local-script $FILTER_SCRIPT - $FILTER_NAME" # filter module
-CMD="$FILTER_CMD  $FILTER_ARGS "
+FILTER_CMD="$CAT $VCF | /usr/local/bin/vcf_filter.py $CMD_ARGS --local-script $FILTER_SCRIPT - $FILTER_NAME" # filter module
+CMD="$FILTER_CMD $FILTER_ARGS "
     
 if [ $OUT_VCF != "-" ]; then
     CMD="$CMD > $OUT_VCF"
