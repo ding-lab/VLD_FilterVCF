@@ -29,8 +29,6 @@ CONFIG_FN is configuration file used by all filters
 Script successively executes vaf, length, depth, and AD filters with unix pipes as,
   python vaf_filter ... | python length_filter ... | python depth_filter ... | python allele_depth_filter ... > output.vcf
 Alternatively, with -N specified intermediate files like TMPD/vaf_output.vcf are written for each step
-
-All calls which do not have PASS filter are rejected
 ...
 EOF
 
