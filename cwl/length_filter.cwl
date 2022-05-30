@@ -20,13 +20,6 @@ inputs:
       position: 1
     label: VCF
     doc: VCF input file to filter
-  - id: config
-    type: File?
-    inputBinding:
-      position: 0
-      prefix: '-C'
-    label: config
-    doc: optional filter configuration file with `length` section
   - id: remove_filtered
     type: boolean?
     inputBinding:
