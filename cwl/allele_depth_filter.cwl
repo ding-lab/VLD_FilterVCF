@@ -35,13 +35,13 @@ inputs:
       prefix: '-E'
     label: Bypass filter
   - id: min_allele_depth_reference
-    type: float?
+    type: int?
     inputBinding:
       position: 0
       prefix: '-m'
     doc: Retain sites where reference allele depth > given value
   - id: min_allele_depth_alternate
-    type: float?
+    type: int?
     inputBinding:
       position: 0
       prefix: '-M'
