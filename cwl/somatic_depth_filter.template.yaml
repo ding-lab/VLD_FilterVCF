@@ -3,9 +3,6 @@ min_depth_normal: 0  # type "int" (optional)
 min_depth_tumor: 0  # type "int" (optional)
 bypass: false  # type "boolean" (optional)
 remove_filtered: false  # type "boolean" (optional)
-config:  # type "File" (optional)
-    class: File
-    path: a/file/path
 VCF:  # type "File"
     class: File
     path: a/file/path
