@@ -41,13 +41,13 @@ inputs:
       position: 0
       prefix: '-E'
     label: Bypass filter
-  - id: min_depth_reference
+  - id: min_allele_depth_reference
     type: float?
     inputBinding:
       position: 0
       prefix: '-m'
     doc: Retain sites where reference allele depth > given value
-  - id: min_depth_alternate
+  - id: min_allele_depth_alternate
     type: float?
     inputBinding:
       position: 0
@@ -58,16 +58,17 @@ inputs:
     inputBinding:
       position: 0
       prefix: '-c'
-    doc: >-
-      AD field format, "VCF" or "varscan" (for non-remapped varscan output)
+    doc: 'AD field format, "VCF" or "varscan" (for non-remapped varscan output)'
 outputs:
   - id: output
     type: File
     outputBinding:
       glob: allele_depth_filter.output.vcf
-doc: |-
-    Filter VCF files according to minimum reference or alternate allele depth values.
-    For multi-sample VCFs this criterion is applied to all samples.
+doc: >-
+  Filter VCF files according to minimum reference or alternate allele depth
+  values.
+
+  For multi-sample VCFs this criterion is applied to all samples.
 label: Allele Depth Filter
 arguments:
   - position: 0
