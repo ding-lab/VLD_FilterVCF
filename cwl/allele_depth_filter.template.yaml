@@ -1,6 +1,6 @@
 caller: a_string  # type "string" (optional)
-min_allele_depth_alternate: 0.1  # type "float" (optional)
-min_allele_depth_reference: 0.1  # type "float" (optional)
+min_allele_depth_alternate: 0  # type "int" (optional)
+min_allele_depth_reference: 0  # type "int" (optional)
 bypass: false  # type "boolean" (optional)
 remove_filtered: false  # type "boolean" (optional)
 VCF:  # type "File"
