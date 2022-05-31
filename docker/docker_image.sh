@@ -1,1 +1,1 @@
-IMAGE="mwyczalkowski/vld_filter_vcf:20201009"
+IMAGE="mwyczalkowski/vld_filter_vcf:20220530"

@@ -11,6 +11,15 @@ See https://github.com/ding-lab/varscan_vcf_remap.git
 
 Code based on https://github.com/ding-lab/TinDaisy-Core  TinDaisy-Core/src/vcf_filters
 
+## Versions
+
+mwyczalkowski/vld_filter_vcf:20220530
+* corrections to germline processing scripts
+* This should be used for TinJasmine
+
+mwyczalkowski/vld_filter_vcf:20201009
+* stable version used for TinDaisy production 
+
 ## Installation
 
 Uses `start_docker.sh` from [WUDocker](https://github.com/ding-lab/WUDocker.git)
