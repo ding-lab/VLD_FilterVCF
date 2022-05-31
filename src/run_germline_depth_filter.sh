@@ -16,14 +16,15 @@ Options:
 -C CONFIG_FN: optional filter configuration file with `depth` section
 -R: remove filtered variants.  Default is to retain filtered variants with filter name in VCF FILTER field
 -m min_depth: Retain sites where read depth > min_depth
+-c caller: specifies tool used for variant call. 'GATK', 'varscan', 'pindel'
 
 VCF is input VCF file
 See python/depth_filter.py for additional details
 ...
 EOF
 
-FILTER_SCRIPT="depth_filter.py"  # filter module
-FILTER_NAME="depth"
+FILTER_SCRIPT="germline_depth_filter.py"  # filter module
+FILTER_NAME="read_depth"
 USAGE="$USAGE_DEPTH"
 
 ### have all filter-specific details above, except for some filter-specific argument parsing below
@@ -44,7 +45,7 @@ export PYTHONPATH="/opt/VLD_FilterVCF/src/python:$PYTHONPATH"
 OUT_VCF="-"
 
 # http://wiki.bash-hackers.org/howto/getopts_tutorial
-while getopts ":hdo:eERm:" opt; do
+while getopts ":hdo:eERm:c:" opt; do
   case $opt in
     h)
       echo "$USAGE"
@@ -67,6 +68,9 @@ while getopts ":hdo:eERm:" opt; do
       ;;
     m)
       FILTER_ARGS="$FILTER_ARGS --min_depth $OPTARG"
+      ;;
+    c)
+      FILTER_ARGS="$FILTER_ARGS --caller $OPTARG"
       ;;
     \?)
       >&2 echo "Invalid option: -$OPTARG"
@@ -105,7 +109,8 @@ fi
 
 # `cat VCF | vcf_filter.py` avoids weird errors
 FILTER_CMD="$CAT $VCF | /usr/local/bin/vcf_filter.py $CMD_ARGS --local-script $FILTER_SCRIPT - $FILTER_NAME" # filter module
-CMD="$FILTER_CMD $FILTER_ARGS --input_vcf $VCF"
+#CMD="$FILTER_CMD $FILTER_ARGS --input_vcf $VCF"
+CMD="$FILTER_CMD $FILTER_ARGS "
     
 if [ $OUT_VCF != "-" ]; then
     CMD="$CMD > $OUT_VCF"
