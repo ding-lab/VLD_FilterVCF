@@ -1,0 +1,17 @@
+# parameters from 
+#   VLD_FilterVCF-varscan.config.ini
+#
+caller: VCF  # type "string" (optional)
+min_allele_depth_alternate: 5  # type "int" (optional)
+min_allele_depth_reference: 0  # type "int" (optional)
+bypass: false  # type "boolean" (optional)
+remove_filtered: false  # type "boolean" (optional)
+
+# WD=/storage1/fs1/m.wyczalkowski/Active/cromwell-data/cromwell-workdir/cromwell-executions/TinJasmine.cwl/020f0455-9d82-4da7-aee3-00408f91a822
+# F=execution/output.normalized.vcf.gz
+# VARINDEL=$WD/call-bcftools_normalize_varscan_indel/$F
+
+VCF:  # type "File"
+    class: File
+    path: /storage1/fs1/m.wyczalkowski/Active/cromwell-data/cromwell-workdir/cromwell-executions/TinJasmine.cwl/020f0455-9d82-4da7-aee3-00408f91a822/call-bcftools_normalize_varscan_indel/execution/output.normalized.vcf.gz
+debug: false  # type "boolean" (optional)

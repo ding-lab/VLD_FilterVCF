@@ -1,11 +1,13 @@
-# start docker image with ../demo_data mapped to /data,
-# unless another path is passed on command line.  uses
-# the start_docker.sh script in /docker
+# Input data to be found here
+DATAD="/storage1/fs1/m.wyczalkowski/Active/cromwell-data/cromwell-workdir/cromwell-executions/TinJasmine.cwl/020f0455-9d82-4da7-aee3-00408f91a822"
+OUTD="/cache1/fs1/home1/Active/home/m.wyczalkowski/Projects/CWL-dev/VLD_FilterVCF/TinJasmine-dev/results"
+mkdir -p $OUTD
 
-#DATAD="/home/mwyczalk_test/Projects/GermlineCaller/C3L-00001"
-DATAD="/home/mwyczalk_test/Projects/GermlineCaller/C3L-00081"
-source ../../docker/docker_image.sh
+# changing directories so entire project directory is mapped by default
+cd ../..
 
-cd ../.. && bash docker/WUDocker/start_docker.sh $@ -I $IMAGE $DATAD:/data
+source docker/docker_image.sh
+
+bash src/WUDocker/start_docker.sh $@ -I $IMAGE $DATAD:/data $OUTD:/results
 
 

@@ -22,7 +22,7 @@ Options:
 -N normal_name: Normal sample name in VCF
 
 VCF is input VCF file
-See python/germline_vaf_filter.py for additional details
+See python/somatic_vaf_filter.py for additional details
 ...
 EOF
 

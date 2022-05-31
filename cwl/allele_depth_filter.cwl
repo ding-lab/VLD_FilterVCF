@@ -51,7 +51,7 @@ inputs:
     inputBinding:
       position: 0
       prefix: '-c'
-    doc: 'AD field format, "VCF" or "varscan" (for non-remapped varscan output)'
+    doc: 'AD field format, "VCF" or "varscan". Varscan-derived VCFs processed with bcftools norm use "varscan" '
 outputs:
   - id: output
     type: File

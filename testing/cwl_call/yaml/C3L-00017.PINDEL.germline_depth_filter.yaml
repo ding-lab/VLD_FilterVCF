@@ -1,0 +1,18 @@
+# parameters from 
+#   VLD_FilterVCF-pindel.config.ini  
+#[read_depth]
+#min_depth = 8
+
+min_depth: 8  # type "int" (optional)
+bypass: false  # type "boolean" (optional)
+remove_filtered: false  # type "boolean" (optional)
+
+# WD=/storage1/fs1/m.wyczalkowski/Active/cromwell-data/cromwell-workdir/cromwell-executions/TinJasmine.cwl/020f0455-9d82-4da7-aee3-00408f91a822
+# F=execution/output.normalized.vcf.gz
+# PINDEL=$WD/call-bcftools_normalize_pindel/$F
+
+VCF:  # type "File"
+    class: File
+    path: /storage1/fs1/m.wyczalkowski/Active/cromwell-data/cromwell-workdir/cromwell-executions/TinJasmine.cwl/020f0455-9d82-4da7-aee3-00408f91a822/call-bcftools_normalize_pindel/execution/output.normalized.vcf.gz
+debug: false  # type "boolean" (optional)
+

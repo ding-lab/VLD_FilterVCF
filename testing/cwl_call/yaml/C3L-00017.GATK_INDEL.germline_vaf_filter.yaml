@@ -1,0 +1,17 @@
+# parameters from 
+#   params/old/VLD_FilterVCF-GATK.config.ini  
+#
+caller: GATK
+max_vaf: 1.0
+min_vaf: 0.2
+bypass: false  # type "boolean" (optional)
+remove_filtered: false  # type "boolean" (optional)
+
+# WD=/storage1/fs1/m.wyczalkowski/Active/cromwell-data/cromwell-workdir/cromwell-executions/TinJasmine.cwl/020f0455-9d82-4da7-aee3-00408f91a822
+# F=execution/output.normalized.vcf.gz
+# GATK_INDEL=$WD/call-bcftools_normalize_gatk_indel/$F
+
+VCF:  # type "File"
+    class: File
+    path: /storage1/fs1/m.wyczalkowski/Active/cromwell-data/cromwell-workdir/cromwell-executions/TinJasmine.cwl/020f0455-9d82-4da7-aee3-00408f91a822/call-bcftools_normalize_gatk_indel/execution/output.normalized.vcf.gz
+debug: false  # type "boolean" (optional)
