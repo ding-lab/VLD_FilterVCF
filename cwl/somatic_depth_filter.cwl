@@ -47,7 +47,7 @@ inputs:
       prefix: '-M'
     doc: Retain sites where read depth for normal > given value
   - id: caller
-    type: string?
+    type: string
     inputBinding:
       position: 0
       prefix: '-c'

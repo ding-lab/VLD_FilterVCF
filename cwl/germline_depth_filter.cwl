@@ -40,6 +40,13 @@ inputs:
       position: 0
       prefix: '-m'
     doc: Retain sites where read depth > min_depth
+  - id: caller
+    type: string
+    inputBinding:
+      position: 0
+      prefix: '-c'
+    doc: >-
+      specifies tool used for variant call. 'GATK', 'varscan', 'pindel'
 outputs:
   - id: output
     type: File

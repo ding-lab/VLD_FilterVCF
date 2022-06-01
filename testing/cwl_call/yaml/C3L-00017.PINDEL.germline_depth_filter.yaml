@@ -6,6 +6,7 @@
 min_depth: 8  # type "int" (optional)
 bypass: false  # type "boolean" (optional)
 remove_filtered: false  # type "boolean" (optional)
+caller: pindel
 
 # WD=/storage1/fs1/m.wyczalkowski/Active/cromwell-data/cromwell-workdir/cromwell-executions/TinJasmine.cwl/020f0455-9d82-4da7-aee3-00408f91a822
 # F=execution/output.normalized.vcf.gz
