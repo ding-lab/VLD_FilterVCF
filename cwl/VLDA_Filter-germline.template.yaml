@@ -1,5 +1,4 @@
-allele_depth_caller: a_string  # type "string" (optional)
-vaf_caller: a_string  # type "string" (optional)
+variant_caller: a_string  # type "string" (optional)
 VCF:  # type "File"
     class: File
     path: a/file/path
