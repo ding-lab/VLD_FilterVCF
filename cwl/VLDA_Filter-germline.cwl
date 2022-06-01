@@ -48,7 +48,7 @@ steps:
   - id: allele_depth_filter
     in:
       - id: VCF
-        source: length_filter/output
+        source: depth_filter/output
       - id: min_allele_depth_reference
         default: 0
       - id: min_allele_depth_alternate
@@ -59,4 +59,14 @@ steps:
       - id: output
     run: ./allele_depth_filter.cwl
     label: Allele Depth Filter
+  - id: depth_filter
+    in:
+      - id: VCF
+        source: length_filter/output
+      - id: min_depth
+        default: 8
+    out:
+      - id: output
+    run: ./germline_depth_filter.cwl
+    label: Depth Filter
 requirements: []
