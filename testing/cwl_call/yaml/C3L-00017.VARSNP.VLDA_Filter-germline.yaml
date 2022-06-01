@@ -1,8 +1,7 @@
 # parameters from 
 #   VLD_FilterVCF-varscan.config.ini
 #
-allele_depth_caller: VCF
-vaf_caller: varscan
+variant_caller: varscan
 
 # WD=/storage1/fs1/m.wyczalkowski/Active/cromwell-data/cromwell-workdir/cromwell-executions/TinJasmine.cwl/020f0455-9d82-4da7-aee3-00408f91a822
 # F=execution/output.normalized.vcf.gz
