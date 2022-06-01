@@ -13,9 +13,10 @@ Code based on https://github.com/ding-lab/TinDaisy-Core  TinDaisy-Core/src/vcf_f
 
 ## Versions
 
-mwyczalkowski/vld_filter_vcf:20220530
+mwyczalkowski/vld_filter_vcf:20220531
 * corrections to germline processing scripts
 * This should be used for TinJasmine
+* Note that tags 20220530 and 20220531x are experimental and should not be used
 
 mwyczalkowski/vld_filter_vcf:20201009
 * stable version used for TinDaisy production 

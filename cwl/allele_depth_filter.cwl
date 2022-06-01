@@ -71,5 +71,5 @@ requirements:
   - class: ResourceRequirement
     ramMin: 2000
   - class: DockerRequirement
-    dockerPull: 'mwyczalkowski/vld_filter_vcf:20220530'
+    dockerPull: 'mwyczalkowski/vld_filter_vcf:20220531'
   - class: InlineJavascriptRequirement

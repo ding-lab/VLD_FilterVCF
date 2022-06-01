@@ -1,6 +1,6 @@
 class: Workflow
 cwlVersion: v1.0
-id: _v_l_d_a__filter_germline
+id: vlda_filter_germline
 label: VLDA_Filter_Germline
 inputs:
   - id: VCF
