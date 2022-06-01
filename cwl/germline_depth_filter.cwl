@@ -45,8 +45,7 @@ inputs:
     inputBinding:
       position: 0
       prefix: '-c'
-    doc: >-
-      specifies tool used for variant call. 'GATK', 'varscan', 'pindel'
+    doc: 'specifies tool used for variant call. ''GATK'', ''varscan'', ''pindel'''
 outputs:
   - id: output
     type: File
@@ -55,7 +54,7 @@ outputs:
 doc: |-
   Filter VCF files according to read depth
   For multi-sample VCFs this criterion is applied to all samples
-label: Depth Filter
+label: Germline Depth Filter
 arguments:
   - position: 0
     prefix: '-o'

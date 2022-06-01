@@ -5,14 +5,11 @@ label: VLDA_Filter_Germline
 inputs:
   - id: VCF
     type: File
-  - id: vaf_caller
+  - id: variant_caller
     type: string?
     doc: >-
       specifies tool used for variant call. 'strelka', 'varscan', 'pindel',
       'merged', 'mutect', 'GATK'
-  - id: allele_depth_caller
-    type: string?
-    doc: Anticipated format of AD field.  Values "VCF" or "varscan"
 outputs:
   - id: output
     outputSource:
@@ -40,7 +37,7 @@ steps:
       - id: max_vaf
         default: 1
       - id: caller
-        source: vaf_caller
+        source: variant_caller
     out:
       - id: output
     run: ./germline_vaf_filter.cwl
@@ -54,7 +51,7 @@ steps:
       - id: min_allele_depth_alternate
         default: 5
       - id: caller
-        source: allele_depth_caller
+        default: VCF
     out:
       - id: output
     run: ./allele_depth_filter.cwl
@@ -65,8 +62,10 @@ steps:
         source: length_filter/output
       - id: min_depth
         default: 8
+      - id: caller
+        source: variant_caller
     out:
       - id: output
     run: ./germline_depth_filter.cwl
-    label: Depth Filter
+    label: Germline Depth Filter
 requirements: []
