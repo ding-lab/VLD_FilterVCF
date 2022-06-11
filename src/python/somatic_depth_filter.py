@@ -58,10 +58,13 @@ class DepthFilter(ConfigFileFilter):
         self.set_args(config, args, "normal_name")
 
         # below becomes Description field in VCF
+        # Logic:
+        #   if depth_N < self.min_depth_normal: FAIL
+        #   if depth_T < self.min_depth_tumor:  FAIL
         if self.bypass:
             self.__doc__ = "Bypassing Depth filter, retaining all reads. Caller = %s" % (self.caller)
         else:
-            self.__doc__ = "Retain calls where read depth in tumor > %s and normal > %d. Caller = %s " % (self.min_depth_tumor, self.min_depth_normal, self.caller)
+            self.__doc__ = "Retain calls where read depth in tumor >= %s and normal >= %d. Caller = %s " % (self.min_depth_tumor, self.min_depth_normal, self.caller)
 
     def filter_name(self):
         return self.name

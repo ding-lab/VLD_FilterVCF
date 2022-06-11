@@ -73,6 +73,9 @@ class TumorNormal_VAF(ConfigFileFilter):
             else:
                 self.__doc__ = "Bypassing VAF filter, retaining all variants.  Caller = %s" % (self.caller)
         else:
+        # Logic:
+        #    if vaf <= self.min_vaf: FAIL
+        #    if vaf > self.max_vaf:  FAIL
             if self.pass_only:
                 self.__doc__ = "Retain variants %f < VAF <= %f and FILTER=PASS.  Caller = %s " % (self.min_vaf, self.max_vaf, self.caller)
             else:

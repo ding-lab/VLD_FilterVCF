@@ -59,10 +59,13 @@ class TumorNormal_VAF(ConfigFileFilter):
         self.set_args(config, args, "normal_name")
 
         # below becomes Description field in VCF
+        # Logic:
+        #   if vaf_N >= self.max_vaf_normal: FAIL
+        #   if vaf_T < self.min_vaf_tumor: FAIL
         if self.bypass:
             self.__doc__ = "Bypassing Tumor Normal VAF filter, retaining all variants.  Caller = %s" % (self.caller)
         else:
-            self.__doc__ = "Retain variants where normal VAF <= %f and tumor VAF >= %f.  Caller = %s " % (self.max_vaf_normal, self.min_vaf_tumor, self.caller)
+            self.__doc__ = "Retain variants where normal VAF < %f and tumor VAF >= %f.  Caller = %s " % (self.max_vaf_normal, self.min_vaf_tumor, self.caller)
             
     def filter_name(self):
         return self.name

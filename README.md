@@ -12,6 +12,10 @@ See https://github.com/ding-lab/varscan_vcf_remap.git
 Code based on https://github.com/ding-lab/TinDaisy-Core  TinDaisy-Core/src/vcf_filters
 
 ## Versions
+mwyczalkowski/vld_filter_vcf:20220611
+* Bugfix to VCF DESCRIPTION field for various filters
+  * ">" vs. ">=" type errors
+* No changes to filter logic or VCF results vs. 20220531
 
 mwyczalkowski/vld_filter_vcf:20220531
 * corrections to germline processing scripts

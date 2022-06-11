@@ -32,6 +32,9 @@ The first two filters (all germline-related) had bugs in mwyczalkowski/vld_filte
 fixed in 'mwyczalkowski/vld_filter_vcf:20220531'.  The remaining 4 filters were unchanged between the two
 versions.  Will update all TinDaisy and TinJasmine v1.2 to use tag 20220531
 
+Tag 20220611 is a bugfix to 20220531 which affects only VCF DESCRIPTION field of VCF, with no changes to
+filter logic.  It replaces 20220531 in all cases.
+
 TinDaisy 2.6 has the somatic depth, somatic vaf, and length filters implemented as separate CWL
 tools and parameters defined in CWL tool
 

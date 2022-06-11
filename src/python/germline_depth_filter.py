@@ -52,7 +52,9 @@ class DepthFilter(ConfigFileFilter):
         if self.bypass:
             self.__doc__ = "Bypassing Depth filter, retaining all reads. Caller = %s" % (self.caller)
         else:
-            self.__doc__ = "Retain calls where read depth > %s . Caller = %s " % (self.min_depth, self.caller)
+            # Logic:
+            #   if depth < self.min_depth: FAIL
+            self.__doc__ = "Retain calls where read depth >= %s . Caller = %s " % (self.min_depth, self.caller)
 
     def filter_name(self):
         return self.name

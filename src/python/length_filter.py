@@ -50,7 +50,12 @@ class IndelLengthFilter(ConfigFileFilter):
         if self.bypass:
             self.__doc__ = "Bypassing Indel Length filter, retaining all reads"
         else:
-            self.__doc__ = "Retain calls where indel length > %d and < %d " % (self.min_length, self.max_length)
+        # logic:
+        #    if len_REF < self.min_length: FAIL
+        #    if len_ALT < self.min_length: FAIL
+        #    if len_REF > self.max_length: FAIL
+        #    if len_ALT > self.max_length: FAIL
+            self.__doc__ = "Retain calls where REF or ALT indel length >= %d and <= %d " % (self.min_length, self.max_length)
         self.debug = args.debug
 
     def filter_name(self):

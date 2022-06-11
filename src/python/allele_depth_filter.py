@@ -62,7 +62,10 @@ class AlleleDepthFilter(ConfigFileFilter):
         if self.bypass:
             self.__doc__ = "Bypassing allele depth filter, retaining all reads. Caller = %s" % (self.caller)
         else:
-            self.__doc__ = "Retain calls with allele depth reference > %s and alternate > %s . Caller = %s " % \
+            # Based on logic:
+            #   if AD_ref < self.min_depth_reference: FAIL
+            #   if AD_alt < self.min_depth_alternate: FAIL
+            self.__doc__ = "Retain calls with allele depth reference >= %s and alternate >= %s . Caller = %s " % \
                 (self.min_depth_reference, self.min_depth_alternate, self.caller)
 
     def filter_name(self):
